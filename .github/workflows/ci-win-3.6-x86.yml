@@ -2,7 +2,7 @@ name: Test(Win-py3.6-x86)
 
 on:
   repository_dispatch:
-    types: [win-py3.6-x86-*]
+    types: [win-py3.6-x86*]
 
 jobs:
   test:

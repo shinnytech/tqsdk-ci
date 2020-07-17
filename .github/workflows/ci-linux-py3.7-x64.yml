@@ -2,7 +2,7 @@ name: Test(Linux-py3.7-x64)
 
 on:
   repository_dispatch:
-    types: [linux-py3.7-x64-*]
+    types: [linux-py3.7-x64*]
 
 jobs:
   test:

@@ -2,7 +2,7 @@ name: Test and Deploy(Linux-py3.6-x64)
 
 on:
   repository_dispatch:
-    types: [linux-py3.6-x64-*]
+    types: [linux-py3.6-x64*]
 
 jobs:
   test:

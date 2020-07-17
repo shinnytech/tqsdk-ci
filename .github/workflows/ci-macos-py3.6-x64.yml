@@ -2,7 +2,7 @@ name: Test(Macos-py3.6-x64)
 
 on:
   repository_dispatch:
-    types: [macos-py3.6-x64-*]
+    types: [macos-py3.6-x64*]
 
 jobs:
   test:

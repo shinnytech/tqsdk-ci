@@ -2,7 +2,7 @@ name: Test(Win-py3.7-x64)
 
 on:
   repository_dispatch:
-    types: [win-py3.7-x64-*]
+    types: [win-py3.7-x64*]
 
 jobs:
   test:
