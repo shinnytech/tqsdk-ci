@@ -81,3 +81,13 @@ jobs:
       with:
         name: ${{ env.TESTLOGNAME }}
         path: ${{ env.TESTLOGPATH }}
+
+    - name: Create commit comment
+      if: success() and ${{ github.event.client_payload.pr }}
+      uses: peter-evans/commit-comment@v1
+      with:
+        token: ${{ secrets.TQSDKCI }}
+        repository: shinnytech/tqsdk-python-private
+        sha: ${{ github.event.client_payload.pr }}
+        body: macos py3.8 x64 run ci success ${{ github.event.client_payload.title }}
+        position: 1
