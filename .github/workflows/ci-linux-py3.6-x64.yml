@@ -97,6 +97,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        repository: shinnytech/tqsdk-python-private
+        ref: ${{ github.event.client_payload.ref }}
+        token: ${{ secrets.TQSDKCI }}
 
     - name: Setup Node.js 12.x
       uses: actions/setup-node@v1
