@@ -22,7 +22,7 @@ jobs:
         issue-number: ${{ github.event.client_payload.pr_number }}
         comment-id: ${{ github.event.client_payload.comment_id }}
         body: |
-          - Workflow url: https://github.com/shinnytech/tqsdk-python-private/actions/runs/${{ github.run_id }}
+          - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -221,7 +221,7 @@ jobs:
         repository: shinnytech/tqsdk-python-private
         token: ${{ secrets.GH_PAT }}
         issue-number: ${{ github.event.client_payload.pr_number }}
-        body-includes:  https://github.com/shinnytech/tqsdk-python-private/actions/runs/${{ github.run_id }}
+        body-includes:  https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
     - name: Add comment show success
       uses: peter-evans/create-or-update-comment@v1
