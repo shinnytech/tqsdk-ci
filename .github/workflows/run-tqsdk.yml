@@ -185,7 +185,7 @@ jobs:
       shell: bash
       run: |
         echo "::set-env name=DIST_DIR::dist/tqsdk-python-private/$(echo ${{ github.event.client_payload.ref }})/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/"
-        echo "::set-env name=DOC_DIR::docs/tqsdk-python-private/$(echo ${{ github.event.client_payload.ref }})/"
+        echo "::set-env name=DOC_DIR::docs/tqsdk-python/$(echo ${{ github.event.client_payload.ref }})/"
 
     - name: Publish dist to AWS S3
       uses: jakejarvis/s3-sync-action@master
