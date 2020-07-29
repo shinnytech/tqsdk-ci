@@ -168,6 +168,7 @@ jobs:
         python -m pip install Sphinx autodocsumm sphinx_rtd_theme jieba
 
     - name: Build wheel on linux platform
+      if: github.event.client_payload.tag_flag != 'true'
       run: |
         pip list
         python setup.py sdist
@@ -180,6 +181,27 @@ jobs:
         python setup.py bdist_wheel -p win_amd64
         rm -rf build
         sphinx-build doc build/doc
+
+    - name: Build wheel on linux platform when tag
+      if: github.event.client_payload.tag_flag == 'true'
+      run: |
+        pip list
+        python setup.py bdist_wheel -p any
+        rm -rf build
+        python setup.py bdist_wheel -p manylinux1_x86_64
+        rm -rf build
+        python setup.py bdist_wheel -p win32
+        rm -rf build
+        python setup.py bdist_wheel -p win_amd64
+        rm -rf build
+        sphinx-build doc build/doc
+
+    - name: Publish to pypi
+      if: github.event.client_payload.tag_flag == 'true'
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
 
     - name: Setup AWS S3 dist path
       shell: bash
