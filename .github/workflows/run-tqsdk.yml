@@ -282,7 +282,7 @@ jobs:
 
   summary:
     name: summary CI result
-    needs: deploy
+    needs: deploy-linux
     runs-on: ubuntu-latest
     steps:
     - name: Find Comment
