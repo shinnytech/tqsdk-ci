@@ -171,12 +171,14 @@ jobs:
 
     - name: Build bdist wheel and doc on linux platform
       if: matrix.envinfo.os == 'linux-3.6-x64'
+      shell: bash
       run: |
         python setup.py bdist_wheel -p any
         rm -rf build
         sphinx-build doc build/doc
 
     - name: Build bdist wheel on different platform
+      shell: bash
       run: |
         rm -rf build
         python setup.py bdist_wheel -p ${{ matrix.envinfo.bdist-platform }}
