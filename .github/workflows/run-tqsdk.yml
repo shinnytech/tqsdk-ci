@@ -179,7 +179,7 @@ jobs:
     - name: Build bdist wheel on different platform
       run: |
         rm -rf build
-        python setup.py bdist_wheel -p ${{ matrix.envinfo.bdist-platform }
+        python setup.py bdist_wheel -p ${{ matrix.envinfo.bdist-platform }}
 
     - name: Publish to pypi
       if: github.event.client_payload.tag_flag == 'true'
