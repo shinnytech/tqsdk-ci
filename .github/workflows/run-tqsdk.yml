@@ -101,7 +101,7 @@ jobs:
       run: |
         git lfs install
         git lfs pull
-        python -m pip install --upgrade pip wheel setuptools pytest pytest-rerunfailures memory_profiler Cython
+        python -m pip install --upgrade pip wheel setuptools pytest pytest-rerunfailures memory_profiler
         python -m pip install -r requirements.txt
 
     - name: Run test case
@@ -124,13 +124,15 @@ jobs:
     needs: test
     strategy:
       matrix:
-        python-version: [3.6.x]
-        python-arch: [x64]
+        envinfo:
+          - { name: 'linux-3.6-x64', os: ubuntu-latest, python-version: 3.6.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
+          - { name: 'windows-3.6-x64', os: windows-latest, python-version: 3.6.x, python-arch: x64, bdist-platform: 'win_amd64' }
+          - { name: 'windows-3.6-x86', os: windows-latest, python-version: 3.6.x, python-arch: x86, bdist-platform: 'win32' }
 
     env:
         PYTHONIOENCODING: "utf-8"
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.envinfo.os }}
 
     steps:
     - name: Checkout
@@ -156,45 +158,28 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: ${{matrix.python-version}}
-        architecture: ${{matrix.python-arch}}
+        python-version: ${{matrix.envinfo.python-version}}
+        architecture: ${{matrix.envinfo.python-arch}}
         
     - name: Install dependencies
       run: |
         git lfs install
         git lfs pull
-        python -m pip install --upgrade pip wheel setuptools
+        python -m pip install --upgrade pip wheel setuptools Cython
         python -m pip install -r requirements.txt
         python -m pip install Sphinx autodocsumm sphinx_rtd_theme jieba
 
-    - name: Build wheel on linux platform
-      if: github.event.client_payload.tag_flag != 'true'
+    - name: Build bdist wheel and doc on linux platform
+      if: matrix.envinfo.os == 'linux-3.6-x64'
       run: |
-        pip list
-        python setup.py sdist
         python setup.py bdist_wheel -p any
-        rm -rf build
-        python setup.py bdist_wheel -p manylinux1_x86_64
-        rm -rf build
-        python setup.py bdist_wheel -p win32
-        rm -rf build
-        python setup.py bdist_wheel -p win_amd64
         rm -rf build
         sphinx-build doc build/doc
 
-    - name: Build wheel on linux platform when tag
-      if: github.event.client_payload.tag_flag == 'true'
+    - name: Build bdist wheel on different platform
       run: |
-        pip list
-        python setup.py bdist_wheel -p any
         rm -rf build
-        python setup.py bdist_wheel -p manylinux1_x86_64
-        rm -rf build
-        python setup.py bdist_wheel -p win32
-        rm -rf build
-        python setup.py bdist_wheel -p win_amd64
-        rm -rf build
-        sphinx-build doc build/doc
+        python setup.py bdist_wheel -p ${{ matrix.envinfo.bdist-platform }
 
     - name: Publish to pypi
       if: github.event.client_payload.tag_flag == 'true'
