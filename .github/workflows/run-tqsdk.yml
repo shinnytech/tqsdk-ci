@@ -170,7 +170,7 @@ jobs:
         python -m pip install Sphinx autodocsumm sphinx_rtd_theme jieba
 
     - name: Build bdist wheel and doc on linux platform
-      if: matrix.envinfo.os == 'linux-3.6-x64'
+      if: matrix.envinfo.name == 'linux-3.6-x64'
       shell: bash
       run: |
         python setup.py bdist_wheel -p any
@@ -214,6 +214,7 @@ jobs:
         DEST_DIR: ${{ env.DIST_DIR }}
 
     - name: Publish tag build/doc to AWS S3
+      if: matrix.envinfo.name == 'linux-3.6-x64'
       uses: jakejarvis/s3-sync-action@master
       with:
         args: --exclude '.doctrees/*'
