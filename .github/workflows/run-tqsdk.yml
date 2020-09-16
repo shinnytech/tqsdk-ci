@@ -96,29 +96,7 @@ jobs:
       with:
         python-version: ${{matrix.envinfo.python-version}}
         architecture: ${{matrix.envinfo.python-arch}}
-        
-    - name: Install dependencies
-      run: |
-        git lfs install
-        git lfs pull
-        python -m pip install --upgrade pip wheel setuptools pytest pytest-rerunfailures memory_profiler
-        python -m pip install -r requirements.txt
 
-    - name: Run test case
-      timeout-minutes: 60
-      shell: bash
-      run: |
-        mkdir -p ${{ env.TESTLOGPATH }}
-        python -W ignore::DeprecationWarning -m pytest --show-capture=no \
-          --log-level=ERROR \
-          --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-
-    - name: Upload log to artifact
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: ${{ env.TESTLOGNAME }}
-        path: ${{ env.TESTLOGPATH }}
 
   deploy:
     needs: test
