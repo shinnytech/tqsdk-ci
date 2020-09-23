@@ -116,7 +116,7 @@ jobs:
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
     
     - name: Upload log to artifact
-      if: always()
+      if: github.event.client_payload.tag_flag != 'true'
       uses: actions/upload-artifact@v1
       with:
         name: ${{ env.TESTLOGNAME }}
