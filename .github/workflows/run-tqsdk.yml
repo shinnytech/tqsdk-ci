@@ -119,6 +119,9 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
+        python -W ignore::DeprecationWarning -m pytest --show-capture=no \
+          --log-level=ERROR \
+          --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Upload log to artifact
       if: github.event.client_payload.tag_flag != 'true'
@@ -219,7 +222,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: doc
-        path: doc
+        path: build/doc
 
   deploy-on-linux:
     needs: build
