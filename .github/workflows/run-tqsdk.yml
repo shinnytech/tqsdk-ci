@@ -141,9 +141,9 @@ jobs:
           - { name: 'linux-3.6-x64', os: ubuntu-latest, python-version: 3.6.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
           - { name: 'linux-3.7-x64', os: ubuntu-latest, python-version: 3.7.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
           - { name: 'linux-3.8-x64', os: ubuntu-latest, python-version: 3.8.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
-          - { name: 'macos-3.6-x64', os: macos-latest, python-version: 3.6.x, python-arch: x64 }
-          - { name: 'macos-3.7-x64', os: macos-latest, python-version: 3.7.x, python-arch: x64 }
-          - { name: 'macos-3.8-x64', os: macos-latest, python-version: 3.8.x, python-arch: x64 }
+          - { name: 'macos-3.6-x64', os: macos-latest, python-version: 3.6.x, python-arch: x64, bdist-platform: 'macos' }
+          - { name: 'macos-3.7-x64', os: macos-latest, python-version: 3.7.x, python-arch: x64, bdist-platform: 'macos' }
+          - { name: 'macos-3.8-x64', os: macos-latest, python-version: 3.8.x, python-arch: x64, bdist-platform: 'macos' }
     env:
         PYTHONIOENCODING: "utf-8"
 
