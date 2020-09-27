@@ -118,9 +118,6 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
-        python -W ignore::DeprecationWarning -m pytest --show-capture=no \
-          --log-level=ERROR \
-          --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Upload log to artifact
       if: github.event.client_payload.tag_flag != 'true'
@@ -129,7 +126,16 @@ jobs:
         name: ${{ env.TESTLOGNAME }}
         path: ${{ env.TESTLOGPATH }}
 
-    - name: Build bdist wheel
+    - name: Build bdist wheel on macos
+      if: matrix.envinfo.os == 'macos-latest'
+      shell: bash
+      run: |
+        rm -rf build
+        python setup.py bdist_wheel
+        ls -lrt
+
+    - name: Build bdist wheel on win and linux
+      if: matrix.envinfo.os != 'macos-latest'
       shell: bash
       run: |
         rm -rf build
