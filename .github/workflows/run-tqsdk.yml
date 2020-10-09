@@ -96,7 +96,7 @@ jobs:
         CI: true
 
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.envinfo.python-version}}
         architecture: ${{matrix.envinfo.python-arch}}
