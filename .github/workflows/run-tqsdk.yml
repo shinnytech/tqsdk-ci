@@ -106,7 +106,6 @@ jobs:
           ${{ matrix.envinfo.os }}-pip-
 
     - name: Install dependencies
-      if: github.event.client_payload.tag_flag != 'true'
       run: |
         git lfs install
         git lfs pull
