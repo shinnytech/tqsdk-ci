@@ -109,7 +109,7 @@ jobs:
       run: |
         git lfs install
         git lfs pull
-        python -m pip install --upgrade pip setuptools pytest pytest-rerunfailures memory_profiler
+        python -m pip install --upgrade pip setuptools pytest pytest-rerunfailures memory_profiler pytest-cov
         python -m pip install wheel==0.34.2
         python -m pip install -r requirements.txt
     
@@ -119,9 +119,10 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
-        python -W ignore::DeprecationWarning -m pytest --show-capture=no \
+        python -W ignore::DeprecationWarning -m pytest --cov=./tqsdk --show-capture=no \
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
+        bash <(curl -s https://codecov.io/bash) -t 7309aedf-b0d9-4b12-babf-5c3b4a25cc4e
 
     - name: Upload log to artifact
       if: github.event.client_payload.tag_flag != 'true'
