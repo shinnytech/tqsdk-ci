@@ -124,11 +124,11 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
-        pytest -W ignore::DeprecationWarning --cov=./tqsdk --show-capture=no \
+        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --show-capture=no \
           -m "not nonparalleltest" -n auto\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-        pytest -W ignore::DeprecationWarning --cov=./tqsdk --show-capture=no \
+        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --show-capture=no \
           -m nonparalleltest \
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
