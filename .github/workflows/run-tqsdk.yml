@@ -113,7 +113,7 @@ jobs:
       run: |
         git lfs install
         git lfs pull
-        python -m pip install --upgrade pip setuptools pytest pytest-rerunfailures memory_profiler pytest-cov
+        python -m pip install --upgrade pip setuptools pytest pytest-rerunfailures memory_profiler pytest-cov pytest-xdist
         python -m pip install wheel==0.34.2
         python -m pip install -r requirements.txt
     
