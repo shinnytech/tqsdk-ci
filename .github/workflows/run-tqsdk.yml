@@ -124,15 +124,20 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
-        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --show-capture=no \
+        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report=xml --show-capture=no \
           -m "not nonparalleltest" -n auto\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --show-capture=no \
+        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report=xml --show-capture=no \
           -m nonparalleltest \
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-        bash <(curl -s https://codecov.io/bash) -t b37d3acd-5b8b-4734-9c9d-dd1a7fa7bbe6
+        ls -lrt
+
+    - uses: 5monkeys/cobertura-action@master
+      with:
+        path: ./coverage.xml
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload log to artifact
       if: github.event.client_payload.tag_flag != 'true'
