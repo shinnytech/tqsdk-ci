@@ -66,6 +66,7 @@ jobs:
           - { name: 'windows-3.9-x86', os: windows-latest, python-version: 3.9.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
 
     env:
+        PYTHONUNBUFFERED: 1
         PYTHONIOENCODING: "utf-8"
         PYTHONHASHSEED: 32
         TZ: ${{ matrix.envinfo.TZ }}
