@@ -120,7 +120,7 @@ jobs:
     
     - name: Run test case
       if: github.event.client_payload.tag_flag != 'true'
-      timeout-minutes: 60
+      timeout-minutes: 90
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
