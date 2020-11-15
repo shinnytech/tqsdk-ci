@@ -141,15 +141,6 @@ jobs:
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
-    - name: Run test performance
-      if: secrets.RUN_TEST_PERFORMANCE == 'true'
-      timeout-minutes: 90
-      shell: bash
-      run: |
-        pytest tqsdk/test/performance -W ignore::DeprecationWarning --show-capture=no \
-          --log-level=ERROR \
-          --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-
     - uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
