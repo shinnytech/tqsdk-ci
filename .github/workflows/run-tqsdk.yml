@@ -118,26 +118,32 @@ jobs:
         python -m pip install wheel==0.34.2
         python -m pip install -r requirements.txt
     
-    - name: Run test case
+    - name: Run test case parallel
       if: github.event.client_payload.tag_flag != 'true'
       timeout-minutes: 90
       shell: bash
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report=xml --show-capture=no \
-          -m "not nonparalleltest" -n auto\
+          -m "not nonparalleltest" --disable-warnings -n auto\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
+
+    - name: Run test case
+      if: github.event.client_payload.tag_flag != 'true'
+      timeout-minutes: 90
+      shell: bash
+      run: |
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report=xml --show-capture=no \
-          -m nonparalleltest \
+          -m nonparalleltest --disable-warnings\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-        ls -lrt
 
     - uses: 5monkeys/cobertura-action@master
       with:
         path: ./coverage.xml
         repo_token: ${{ secrets.GITHUB_TOKEN }}
+        pull_request_number: 2
 
     - name: Upload log to artifact
       if: github.event.client_payload.tag_flag != 'true'
