@@ -150,8 +150,9 @@ jobs:
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
-    - uses: codecov/codecov-action@v1
+    - name: Upload codecov
       if matrix.envinfo.name == 'linux-3.6-x64'
+      uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage1.xml,./coverage2.xml
