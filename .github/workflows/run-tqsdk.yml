@@ -132,7 +132,6 @@ jobs:
           -m nonparalleltest \
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-        ls -lrt
 
     - uses: 5monkeys/cobertura-action@master
       with:
