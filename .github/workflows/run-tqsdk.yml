@@ -151,7 +151,7 @@ jobs:
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - uses: codecov/codecov-action@v1
-     if matrix.envinfo.name == 'linux-3.6-x64'
+      if matrix.envinfo.name == 'linux-3.6-x64'
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage1.xml,./coverage2.xml
