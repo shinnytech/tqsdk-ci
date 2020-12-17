@@ -125,7 +125,7 @@ jobs:
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no \
-          --ignore=./tqsdk/test/performance \
+          --ignore=./tqsdk/test/performance -n auto\
           -m "not nonparalleltest" --disable-warnings\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
