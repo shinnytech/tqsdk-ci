@@ -147,7 +147,7 @@ jobs:
         files: ./coverage1.xml,./coverage2.xml
 
     - name: Upload log to artifact
-      if: github.event.client_payload.tag_flag != 'true' and always()
+      if: always() && github.event.client_payload.tag_flag != 'true'
       uses: actions/upload-artifact@v1
       with:
         name: ${{ env.TESTLOGNAME }}
