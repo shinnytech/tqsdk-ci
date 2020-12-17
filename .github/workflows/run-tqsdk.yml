@@ -126,7 +126,7 @@ jobs:
         mkdir -p ${{ env.TESTLOGPATH }}
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no \
           --ignore=./tqsdk/test/performance \
-          -m "not nonparalleltest" --disable-warnings -n auto\
+          -m "not nonparalleltest" --disable-warnings\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
@@ -179,6 +179,7 @@ jobs:
         ls -lrt
 
     - name: Upload bdist package
+      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: bdist-file
