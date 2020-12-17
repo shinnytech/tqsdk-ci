@@ -147,7 +147,7 @@ jobs:
         files: ./coverage1.xml,./coverage2.xml
 
     - name: Upload log to artifact
-      if: github.event.client_payload.tag_flag != 'true'
+      if: github.event.client_payload.tag_flag != 'true' and always()
       uses: actions/upload-artifact@v1
       with:
         name: ${{ env.TESTLOGNAME }}
@@ -179,7 +179,6 @@ jobs:
         ls -lrt
 
     - name: Upload bdist package
-      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: bdist-file
