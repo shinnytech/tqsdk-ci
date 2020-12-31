@@ -1,0 +1,70 @@
+name: check-dependence-daily
+
+on:
+  schedule:
+  - cron: "0 22 * * *"
+
+jobs:
+  test-and-check:
+    strategy:
+      matrix:
+        envinfo:
+          - { name: 'linux-3.6-x64', os: ubuntu-latest, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.7-x64', os: ubuntu-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.8-x64', os: ubuntu-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.9-x64', os: ubuntu-latest, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'macos-3.6-x64', os: macos-latest, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'macos-3.7-x64', os: macos-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'macos-3.8-x64', os: macos-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'macos-3.9-x64', os: macos-latest, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'windows-3.6-x64', os: windows-latest, python-version: 3.6.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+          - { name: 'windows-3.6-x86', os: windows-latest, python-version: 3.6.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
+          - { name: 'windows-3.7-x64', os: windows-latest, python-version: 3.7.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+          - { name: 'windows-3.7-x86', os: windows-latest, python-version: 3.7.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
+          - { name: 'windows-3.8-x64', os: windows-latest, python-version: 3.8.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+          - { name: 'windows-3.8-x86', os: windows-latest, python-version: 3.8.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
+          - { name: 'windows-3.9-x64', os: windows-latest, python-version: 3.9.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+          - { name: 'windows-3.9-x86', os: windows-latest, python-version: 3.9.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
+
+    env:
+        PYTHONUNBUFFERED: 1
+        PYTHONIOENCODING: "utf-8"
+        PYTHONHASHSEED: 32
+        TZ: ${{ matrix.envinfo.TZ }}
+
+    runs-on: ${{ matrix.envinfo.os }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.envinfo.python-version}}
+        architecture: ${{matrix.envinfo.python-arch}}
+
+    - name: Install latest tqsdk
+      run: |
+        python -m pip install tqsdk pytest
+    
+    - name: Run test case and check tqsdk
+      run: |
+        echo "tqsdk 运行失败" > error.log
+        echo "date: $(date -d today +%Y%m%d)" >> error.log
+        echo "env : python-${{matrix.envinfo.python-version}}-${{matrix.envinfo.python-arch}} ${{matrix.envinfo.name}}" >> error.log
+        pip list >> error.log
+        pytest -x test/api --show-capture=no >> error.log
+    
+    - name: send email after CI failed
+      if: ${{ failure() }}
+      uses: dawidd6/action-send-mail@v2
+      with:
+        server_address: smtpdm.aliyun.com
+        server_port: 465
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: TqSDK 健康检查
+        body: file://error.log
+        to: ${{secrets.EMAIL_LIST}}
+        from: TqSDK CI for depence check # <user@example.com>
