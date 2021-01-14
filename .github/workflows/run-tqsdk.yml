@@ -136,6 +136,7 @@ jobs:
       timeout-minutes: 90
       shell: bash
       run: |
+        pip install pytest-rerunfailures
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage2.xml --show-capture=no \
           --ignore=./tqsdk/test/performance \
           -m nonparalleltest --disable-warnings -x\
