@@ -143,14 +143,9 @@ jobs:
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
-    - uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./coverage1.xml,./coverage2.xml
-
     - name: Upload log to artifact
       if: always() && github.event.client_payload.tag_flag != 'true'
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: ${{ env.TESTLOGNAME }}
         path: ${{ env.TESTLOGPATH }}
