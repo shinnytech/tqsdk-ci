@@ -126,7 +126,7 @@ jobs:
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no \
-          --ignore=./tqsdk/test/performance -n auto\
+          -n auto\
           -m "not nonparalleltest" --disable-warnings\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
@@ -138,7 +138,6 @@ jobs:
       run: |
         pip install pytest-rerunfailures
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage2.xml --show-capture=no \
-          --ignore=./tqsdk/test/performance \
           -m nonparalleltest --disable-warnings -x\
           --log-level=ERROR \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
