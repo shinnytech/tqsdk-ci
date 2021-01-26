@@ -128,7 +128,7 @@ jobs:
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no \
           -n auto\
           -m "not nonparalleltest" --disable-warnings\
-          --log-level=ERROR \
+          --log-level=ERROR --log-file-format="%(asctime)s %(levelname)s %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Run test case
@@ -139,7 +139,7 @@ jobs:
         pip install pytest-rerunfailures
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage2.xml --show-capture=no \
           -m nonparalleltest --disable-warnings -x\
-          --log-level=ERROR \
+          --log-level=ERROR --log-file-format="%(asctime)s %(levelname)s %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Upload log to artifact
