@@ -119,8 +119,8 @@ jobs:
         python -m pip install Sphinx==3.3.1
         python -m pip install -r requirements.txt
     
-    test_case_parallel
     - name: Run test case parallel
+      id: test_case_parallel
       if: github.event.client_payload.tag_flag != 'true'
       timeout-minutes: 90
       shell: bash
@@ -132,8 +132,8 @@ jobs:
           --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
-    test_case_nonparallel
     - name: Run test case
+      id: test_case_nonparallel
       if: github.event.client_payload.tag_flag != 'true'
       timeout-minutes: 90
       shell: bash
