@@ -145,7 +145,7 @@ jobs:
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Upload log to artifact
-      if: ${{ steps.test_case_parallel.outcome == 'failure' || steps.test_case_nonparallel.outcome == 'failure' }} && github.event.client_payload.tag_flag != 'true'
+      if: ${{ steps.test_case_parallel.outcome != 'success' || steps.test_case_nonparallel.outcome == 'success' }} && github.event.client_payload.tag_flag != 'true'
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.TESTLOGNAME }}
