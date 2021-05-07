@@ -120,6 +120,7 @@ jobs:
         python -m pip install -r requirements.txt
     
     - name: Run test case parallel
+      id: test_case_parallel
       if: github.event.client_payload.tag_flag != 'true'
       timeout-minutes: 90
       shell: bash
@@ -132,6 +133,7 @@ jobs:
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Run test case
+      id: test_case_nonparallel
       if: github.event.client_payload.tag_flag != 'true'
       timeout-minutes: 90
       shell: bash
@@ -139,11 +141,11 @@ jobs:
         pip install pytest-rerunfailures
         pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage2.xml\
           -m nonparalleltest --disable-warnings\
-          --log-level=DEBUG --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
+          --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
     - name: Upload log to artifact
-      if: always() && github.event.client_payload.tag_flag != 'true'
+      if: ${{ steps.test_case_parallel.outcome == 'failure' || steps.test_case_nonparallel.outcome == 'failure' }} && github.event.client_payload.tag_flag != 'true'
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.TESTLOGNAME }}
