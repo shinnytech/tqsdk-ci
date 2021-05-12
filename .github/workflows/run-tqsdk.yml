@@ -82,6 +82,7 @@ jobs:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
         token: ${{ secrets.GH_PAT }}
+        submodules: 'true'
 
     - name: Setup Node.js 12.x
       uses: actions/setup-node@v1
