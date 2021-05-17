@@ -3,67 +3,16 @@ name: CI for tqsdk-python-private
 on:
   repository_dispatch:
     types: [run-ci-*]
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
 
 jobs:
   setup:
     name: log the workflow url in src repo in pr comment
     runs-on: ubuntu-latest
-    steps:
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
-    - name: Add comment show workflow url
-      uses: peter-evans/create-or-update-comment@v1
-      with:
-        token: ${{ secrets.GH_PAT }}
-        repository: shinnytech/tqsdk-python-private
-        issue-number: ${{ github.event.client_payload.pr_number }}
-        comment-id: ${{ github.event.client_payload.comment_id }}
-        body: |
-          - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
-
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        repository: shinnytech/tqsdk-python-private
-        ref: ${{ github.event.client_payload.ref }}
-        token: ${{ secrets.GH_PAT }}
-
-    - name: Giant Files List
-      id: giant-files-list
-      run: |
-        git ls-files | xargs ls -l | sort -nrk5 | awk '{if($5 > ${{ secrets.FILE_LIMIT_SIZE }}) print $9 }' | xargs ls -lrth
-        echo "::set-output name=GIANT-FILES-COUNT::$(git ls-files | xargs ls -l | sort -nrk5 | awk '{if($5 > ${{ secrets.FILE_LIMIT_SIZE }}) print $0}' | wc -l)"
-
-    - name: Giant Files Check
-      if: steps.giant-files-list.outputs.GIANT-FILES-COUNT != 0
-      run: |
-        echo "files size check failed"
-        exit 1
-
-  test-and-build:
-    needs: setup
-    strategy:
-      matrix:
-        envinfo:
-          - { name: 'linux-3.6-x64', os: ubuntu-latest, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.7-x64', os: ubuntu-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.8-x64', os: ubuntu-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.9-x64', os: ubuntu-latest, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'macos-3.6-x64', os: macos-latest, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'macos-3.7-x64', os: macos-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'macos-3.8-x64', os: macos-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'macos-3.9-x64', os: macos-latest, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'windows-3.6-x64', os: windows-latest, python-version: 3.6.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
-          - { name: 'windows-3.6-x86', os: windows-latest, python-version: 3.6.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-          - { name: 'windows-3.7-x64', os: windows-latest, python-version: 3.7.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
-          - { name: 'windows-3.7-x86', os: windows-latest, python-version: 3.7.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-          - { name: 'windows-3.8-x64', os: windows-latest, python-version: 3.8.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
-          - { name: 'windows-3.8-x86', os: windows-latest, python-version: 3.8.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-          - { name: 'windows-3.9-x64', os: windows-latest, python-version: 3.9.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
-          - { name: 'windows-3.9-x86', os: windows-latest, python-version: 3.9.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
 
     env:
         PYTHONUNBUFFERED: 1
@@ -73,79 +22,25 @@ jobs:
         TESTLOGPATH: "./log_archive/"
         TESTLOGNAME: ${{ matrix.envinfo.name }}
 
-    runs-on: ${{ matrix.envinfo.os }}
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        repository: shinnytech/tqsdk-python-private
-        ref: ${{ github.event.client_payload.ref }}
-        token: ${{ secrets.GH_PAT }}
-        submodules: 'recursive'
-
-    - name: Setup Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-
-    - name: Package web
-      run: |
-        cd ./web/
-        yarn install --frozen-lockfile
-        yarn run build
-      env:
-        CI: true
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{matrix.envinfo.python-version}}
-        architecture: ${{matrix.envinfo.python-arch}}
-
-    - name: Cache dependencies
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/pip
-        key: ${{ matrix.envinfo.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ matrix.envinfo.os }}-pip-
-
-    - name: Install dependencies
-      run: |
-        git lfs install
-        git lfs pull
-        python -m pip install --upgrade pip setuptools pytest memory_profiler pytest-cov pytest-xdist
-        python -m pip install wheel==0.34.2
-        python -m pip install Sphinx==3.3.1
-        python -m pip install -r requirements.txt
     
     - name: Run test case parallel
       id: test_case_parallel
-      if: github.event.client_payload.tag_flag != 'true'
-      timeout-minutes: 90
+      timeout-minutes: 1
       shell: bash
       run: |
-        mkdir -p ${{ env.TESTLOGPATH }}
-        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no \
-          -n auto\
-          -m "not nonparalleltest" --disable-warnings\
-          --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
-          --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
+        exit 1
 
     - name: Run test case
       id: test_case_nonparallel
-      if: github.event.client_payload.tag_flag != 'true'
-      timeout-minutes: 90
+      if: ${{ always() }}
+      timeout-minutes: 1
       shell: bash
       run: |
-        pip install pytest-rerunfailures
-        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage2.xml\
-          -m nonparalleltest --disable-warnings\
-          --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
-          --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
+        exit 0
           
     - name: Print Test Result
+      if: ${{ failure()  }}
       run: |
         echo ${{ steps.test_case_parallel.outcome != 'success' }}
         echo ${{ steps.test_case_nonparallel.outcome != 'success' }}
@@ -153,137 +48,6 @@ jobs:
         echo ${{ (steps.test_case_parallel.outcome != 'success' || steps.test_case_nonparallel.outcome != 'success') && github.event.client_payload.tag_flag != 'true' }}
 
     - name: Upload log to artifact
-      if: ${{ (steps.test_case_parallel.outcome != 'success' || steps.test_case_nonparallel.outcome != 'success') && github.event.client_payload.tag_flag != 'true' }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.TESTLOGNAME }}
-        path: ${{ env.TESTLOGPATH }}
-
-    - name: Build bdist wheel on macos
-      if: matrix.envinfo.os == 'macos-latest'
-      shell: bash
-      run: |
-        rm -rf build
-        python setup.py bdist_wheel
-        ls -lrt
-
-    - name: Build bdist wheel on win and linux
-      if: matrix.envinfo.os != 'macos-latest'
-      shell: bash
-      run: |
-        rm -rf build
-        python setup.py bdist_wheel -p ${{ matrix.envinfo.bdist-platform }}
-        ls -lrt
-
-    - name: Build src wheel and doc on linux platform
-      if: matrix.envinfo.os == 'ubuntu-latest'
-      shell: bash
-      run: |
-        python setup.py bdist_wheel -p any
-        rm -rf build
-        sphinx-build doc build/doc
-        ls -lrt
-
-    - name: Upload bdist package
-      uses: actions/upload-artifact@v2
-      with:
-        name: bdist-file
-        path: dist/*.whl
-
-    - name: Upload doc package
-      uses: actions/upload-artifact@v2
-      with:
-        name: doc
-        path: build/doc
-
-  deploy-on-linux:
-    needs: test-and-build
-    strategy:
-      matrix:
-        envinfo:
-          - { name: 'linux-3.6-x64', os: ubuntu-latest, python-version: 3.6.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
-
-    env:
-        PYTHONIOENCODING: "utf-8"
-
-    runs-on: ${{ matrix.envinfo.os }}
-
-    steps:
-    - name: Download bdist on win platform
-      uses: actions/download-artifact@v2
-      with:
-        name: bdist-file
-        path: ./dist
-
-    - name: Download bdist on win platform
-      uses: actions/download-artifact@v2
-      with:
-        name: doc
-        path: ./doc
-
-    - name: Publish to pypi
-      if: github.event.client_payload.tag_flag == 'true'
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
-
-    - name: Setup AWS S3 dist path
-      shell: bash
-      run: |
-        echo "DIST_DIR=dist/tqsdk-python-private/$(echo ${{ github.event.client_payload.ref }})/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/" >> $GITHUB_ENV
-        echo "DOC_DIR=docs/tqsdk-python/$(echo ${{ github.event.client_payload.ref }})/" >> $GITHUB_ENV
-
-    - name: Setup AWS S3 dist path
-      if: github.event.client_payload.ref == 'refs/heads/master'
-      shell: bash
-      run: |
-        echo "DIST_DIR=dist/tqsdk-python-private/master/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/" >> $GITHUB_ENV
-        echo "DOC_DIR=docs/tqsdk-python/master/" >> $GITHUB_ENV
-
-    - name: Publish dist to AWS S3
-      uses: jakejarvis/s3-sync-action@master
-      env:
-        AWS_S3_BUCKET: ${{ secrets.BUCKET_NAME }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        SOURCE_DIR: "dist"
-        DEST_DIR: ${{ env.DIST_DIR }}
-
-    - name: Publish tag build/doc to AWS S3
-      uses: jakejarvis/s3-sync-action@master
-      with:
-        args: --exclude '.doctrees/*'
-      env:
-        AWS_S3_BUCKET: ${{ secrets.BUCKET_NAME }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        SOURCE_DIR: "doc"
-        DEST_DIR: ${{ env.DOC_DIR }}
-
-  summary:
-    name: summary CI result
-    needs: deploy-on-linux
-    runs-on: ubuntu-latest
-    steps:
-    - name: Find Comment
-      uses: peter-evans/find-comment@v1
-      id: fc
-      with:
-        repository: shinnytech/tqsdk-python-private
-        token: ${{ secrets.GH_PAT }}
-        issue-number: ${{ github.event.client_payload.pr_number }}
-        body-includes:  https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
-
-    - name: Add comment show success
-      uses: peter-evans/create-or-update-comment@v1
-      with:
-        token: ${{ secrets.GH_PAT }}
-        repository: shinnytech/tqsdk-python-private
-        issue-number: ${{ github.event.client_payload.pr_number }}
-        comment-id: ${{ steps.fc.outputs.comment-id }}
-        body: |
-          workflow ${{ github.run_id }} run success!
-        reactions: '+1'
+      if: ${{ failure() }}
+      run:
+        echo ${{ (steps.test_case_parallel.outcome != 'success' || steps.test_case_nonparallel.outcome != 'success') && github.event.client_payload.tag_flag != 'true' }}
