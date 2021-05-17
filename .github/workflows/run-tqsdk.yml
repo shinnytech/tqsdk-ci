@@ -144,16 +144,9 @@ jobs:
           -m nonparalleltest --disable-warnings\
           --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
-          
-    - name: Print Test Result
-      run: |
-        echo ${{ steps.test_case_parallel.outcome != 'success' }}
-        echo ${{ steps.test_case_nonparallel.outcome != 'success' }}
-        echo ${{ github.event.client_payload.tag_flag != 'true' }}
-        echo ${{ (steps.test_case_parallel.outcome != 'success' || steps.test_case_nonparallel.outcome != 'success') && github.event.client_payload.tag_flag != 'true' }}
 
     - name: Upload log to artifact
-      if: ${{ (steps.test_case_parallel.outcome != 'success' || steps.test_case_nonparallel.outcome != 'success') && github.event.client_payload.tag_flag != 'true' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.TESTLOGNAME }}
