@@ -152,43 +152,6 @@ jobs:
         name: ${{ env.TESTLOGNAME }}
         path: ${{ env.TESTLOGPATH }}
 
-    - name: Build bdist wheel on macos
-      if: matrix.envinfo.os == 'macos-latest'
-      shell: bash
-      run: |
-        rm -rf build
-        python setup.py bdist_wheel
-        ls -lrt
-
-    - name: Build bdist wheel on win and linux
-      if: matrix.envinfo.os != 'macos-latest'
-      shell: bash
-      run: |
-        rm -rf build
-        python setup.py bdist_wheel -p ${{ matrix.envinfo.bdist-platform }}
-        ls -lrt
-
-    - name: Build src wheel and doc on linux platform
-      if: matrix.envinfo.os == 'ubuntu-latest'
-      shell: bash
-      run: |
-        python setup.py bdist_wheel -p any
-        rm -rf build
-        sphinx-build doc build/doc
-        ls -lrt
-
-    - name: Upload bdist package
-      uses: actions/upload-artifact@v2
-      with:
-        name: bdist-file
-        path: dist/*.whl
-
-    - name: Upload doc package
-      uses: actions/upload-artifact@v2
-      with:
-        name: doc
-        path: build/doc
-
   deploy-on-linux:
     needs: test-and-build
     strategy:
@@ -202,17 +165,79 @@ jobs:
     runs-on: ${{ matrix.envinfo.os }}
 
     steps:
-    - name: Download bdist on win platform
-      uses: actions/download-artifact@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        repository: shinnytech/tqsdk-python-private
+        ref: ${{ github.event.client_payload.ref }}
+        token: ${{ secrets.GH_PAT }}
+        submodules: 'recursive'
+
+    - name: Setup Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Package web
+      run: |
+        cd ./web/
+        yarn install --frozen-lockfile
+        yarn run build
+      env:
+        CI: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.envinfo.python-version}}
+        architecture: ${{matrix.envinfo.python-arch}}
+
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ matrix.envinfo.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ matrix.envinfo.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        git lfs install
+        git lfs pull
+        python -m pip install --upgrade pip setuptools
+        python -m pip install wheel==0.34.2
+        python -m pip install Sphinx==3.3.1
+        python -m pip install -r requirements.txt
+    
+    - name: Build bdist wheel 
+      shell: bash
+      run: |
+        python setup.py sdist
+        python setup.py bdist_wheel -p any
+        rm -rf build
+        python setup.py bdist_wheel -p manylinux1_x86_64
+        rm -rf build
+        python setup.py bdist_wheel -p win32
+        rm -rf build
+        python setup.py bdist_wheel -p win_amd64
+
+    - name: Sphinx build
+      shell: bash
+      run: |
+        rm -rf build
+        sphinx-build doc build/doc
+
+    - name: Upload bdist package
+      uses: actions/upload-artifact@v2
       with:
         name: bdist-file
-        path: ./dist
+        path: dist/*.whl
 
-    - name: Download bdist on win platform
-      uses: actions/download-artifact@v2
+    - name: Upload doc package
+      uses: actions/upload-artifact@v2
       with:
         name: doc
-        path: ./doc
+        path: build/doc
 
     - name: Publish to pypi
       if: github.event.client_payload.tag_flag == 'true'
@@ -253,7 +278,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-        SOURCE_DIR: "doc"
+        SOURCE_DIR: "build/doc"
         DEST_DIR: ${{ env.DOC_DIR }}
 
   summary:
