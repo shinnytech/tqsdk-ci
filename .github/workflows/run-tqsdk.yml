@@ -43,8 +43,40 @@ jobs:
         echo "files size check failed"
         exit 1
 
-  test-and-build:
+  build-web:
+    name: build web packages
+    runs-on: ubuntu-latest
     needs: setup
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        repository: shinnytech/tqsdk-python-private
+        ref: ${{ github.event.client_payload.ref }}
+        token: ${{ secrets.GH_PAT }}
+        submodules: 'recursive'
+
+    - name: Setup Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Package web
+      run: |
+        cd ./web/
+        yarn install --frozen-lockfile
+        yarn run build
+      env:
+        CI: true
+
+    - name: Upload web package
+      uses: actions/upload-artifact@v2
+      with:
+        name: web-files
+        path: tqsdk/web/*
+
+  test-and-build:
+    needs: build-web
     strategy:
       matrix:
         envinfo:
@@ -82,20 +114,12 @@ jobs:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
         token: ${{ secrets.GH_PAT }}
-        submodules: 'recursive'
 
-    - name: Setup Node.js 12.x
-      uses: actions/setup-node@v1
+    - name: Download web-files
+      uses: actions/download-artifact@v2
       with:
-        node-version: 12.x
-
-    - name: Package web
-      run: |
-        cd ./web/
-        yarn install --frozen-lockfile
-        yarn run build
-      env:
-        CI: true
+        name: web-files
+        path: ./tqsdk/web
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -171,20 +195,12 @@ jobs:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
         token: ${{ secrets.GH_PAT }}
-        submodules: 'recursive'
 
-    - name: Setup Node.js 12.x
-      uses: actions/setup-node@v1
+    - name: Download web-files
+      uses: actions/download-artifact@v2
       with:
-        node-version: 12.x
-
-    - name: Package web
-      run: |
-        cd ./web/
-        yarn install --frozen-lockfile
-        yarn run build
-      env:
-        CI: true
+        name: web-files
+        path: ./tqsdk/web
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -232,6 +248,12 @@ jobs:
       with:
         name: bdist-file
         path: dist/*.whl
+
+    - name: Upload sdist package
+      uses: actions/upload-artifact@v2
+      with:
+        name: sdist-file
+        path: dist/*.tar.gz
 
     - name: Upload doc package
       uses: actions/upload-artifact@v2
