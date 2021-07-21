@@ -303,6 +303,41 @@ jobs:
         SOURCE_DIR: "build/doc"
         DEST_DIR: ${{ env.DOC_DIR }}
 
+  tqsdk-python:
+    name: tqsdk-python commit and pr
+    needs: deploy-on-linux
+    runs-on: ubuntu-latest
+    if: github.event.client_payload.tag_flag == 'true'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        repository: shinnytech/tqsdk-python
+        ref: master
+        token: ${{ secrets.GH_PAT }}
+
+    - name: Download sdist
+      uses: actions/download-artifact@v2
+      with:
+        name: sdist-file
+        path: ../
+
+    - name: unzip
+      shell: bash
+      run: |
+        cd ..
+        tar -x -f *.tar.gz
+        cp -R "tqsdk-${{ github.event.client_payload.tag_name }}/" tqsdk-ci
+        cd tqsdk-ci
+        git status
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        commit-message: "Update Version ${{ github.event.client_payload.tag_name }}"
+        branch-suffix: short-commit-hash
+        title: '[Tqsdk-Ci] Update Version ${{ github.event.client_payload.tag_name }}'
+
   summary:
     name: summary CI result
     needs: deploy-on-linux
