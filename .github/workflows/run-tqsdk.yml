@@ -269,47 +269,47 @@ jobs:
         name: doc-files
         path: doc/*
 
-#     - name: Publish to pypi
-#       if: github.event.client_payload.tag_flag == 'true'
-#       uses: pypa/gh-action-pypi-publish@master
-#       with:
-#         user: __token__
-#         password: ${{ secrets.PYPI_PASSWORD }}
+    - name: Publish to pypi
+      if: github.event.client_payload.tag_flag == 'true'
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
 
-#     - name: Setup AWS S3 dist path
-#       shell: bash
-#       run: |
-#         echo "DIST_DIR=dist/tqsdk-python-private/$(echo ${{ github.event.client_payload.ref }})/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/" >> $GITHUB_ENV
-#         echo "DOC_DIR=docs/tqsdk-python/$(echo ${{ github.event.client_payload.ref }})/" >> $GITHUB_ENV
+    - name: Setup AWS S3 dist path
+      shell: bash
+      run: |
+        echo "DIST_DIR=dist/tqsdk-python-private/$(echo ${{ github.event.client_payload.ref }})/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/" >> $GITHUB_ENV
+        echo "DOC_DIR=docs/tqsdk-python/$(echo ${{ github.event.client_payload.ref }})/" >> $GITHUB_ENV
 
-#     - name: Setup AWS S3 dist path
-#       if: github.event.client_payload.ref == 'refs/heads/master'
-#       shell: bash
-#       run: |
-#         echo "DIST_DIR=dist/tqsdk-python-private/master/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/" >> $GITHUB_ENV
-#         echo "DOC_DIR=docs/tqsdk-python/master/" >> $GITHUB_ENV
+    - name: Setup AWS S3 dist path
+      if: github.event.client_payload.ref == 'refs/heads/master'
+      shell: bash
+      run: |
+        echo "DIST_DIR=dist/tqsdk-python-private/master/$(date -d today +%Y%m%d)_$(echo ${{ github.event.client_payload.sha }})/" >> $GITHUB_ENV
+        echo "DOC_DIR=docs/tqsdk-python/master/" >> $GITHUB_ENV
 
-#     - name: Publish dist to AWS S3
-#       uses: jakejarvis/s3-sync-action@master
-#       env:
-#         AWS_S3_BUCKET: ${{ secrets.BUCKET_NAME }}
-#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         AWS_REGION: ${{ secrets.AWS_REGION }}
-#         SOURCE_DIR: "dist"
-#         DEST_DIR: ${{ env.DIST_DIR }}
+    - name: Publish dist to AWS S3
+      uses: jakejarvis/s3-sync-action@master
+      env:
+        AWS_S3_BUCKET: ${{ secrets.BUCKET_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        SOURCE_DIR: "dist"
+        DEST_DIR: ${{ env.DIST_DIR }}
 
-#     - name: Publish tag build/doc to AWS S3
-#       uses: jakejarvis/s3-sync-action@master
-#       with:
-#         args: --exclude '.doctrees/*'
-#       env:
-#         AWS_S3_BUCKET: ${{ secrets.BUCKET_NAME }}
-#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         AWS_REGION: ${{ secrets.AWS_REGION }}
-#         SOURCE_DIR: "build/doc"
-#         DEST_DIR: ${{ env.DOC_DIR }}
+    - name: Publish tag build/doc to AWS S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --exclude '.doctrees/*'
+      env:
+        AWS_S3_BUCKET: ${{ secrets.BUCKET_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        SOURCE_DIR: "build/doc"
+        DEST_DIR: ${{ env.DOC_DIR }}
 
   tqsdk-python:
     name: tqsdk-python commit and pr
