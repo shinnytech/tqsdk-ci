@@ -311,7 +311,6 @@ jobs:
 
   tqsdk-python:
     name: tqsdk-python commit and pr
-    needs: deploy-on-linux
     runs-on: ubuntu-latest
     if: github.event.client_payload.tag_flag == 'true'
     steps:
