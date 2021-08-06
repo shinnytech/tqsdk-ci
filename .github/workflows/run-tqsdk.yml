@@ -267,12 +267,12 @@ jobs:
         name: doc-files
         path: doc/*
 
-    - name: Publish to pypi
-      if: github.event.client_payload.tag_flag == 'true'
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
+#     - name: Publish to pypi
+#       if: github.event.client_payload.tag_flag == 'true'
+#       uses: pypa/gh-action-pypi-publish@master
+#       with:
+#         user: __token__
+#         password: ${{ secrets.PYPI_PASSWORD }}
 
     - name: Setup AWS S3 dist path
       shell: bash
@@ -312,6 +312,7 @@ jobs:
   tqsdk-python:
     name: tqsdk-python commit and pr
     runs-on: ubuntu-latest
+    needs: deploy-on-linux
     if: github.event.client_payload.tag_flag == 'true'
     steps:
     - name: Checkout
