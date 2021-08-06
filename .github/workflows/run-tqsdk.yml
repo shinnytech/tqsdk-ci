@@ -339,7 +339,7 @@ jobs:
       run: |
         cd ..
         tar -x -f *.tar.gz
-        cp -R "tqsdk-${{ github.event.client_payload.tag_name }}/" tqsdk-ci
+        cp -R tqsdk-${{github.event.client_payload.tag_name}}/ tqsdk-ci
         cd tqsdk-ci
         git status
 
