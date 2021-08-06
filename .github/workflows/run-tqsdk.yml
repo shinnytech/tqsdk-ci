@@ -314,8 +314,8 @@ jobs:
   tqsdk-python:
     name: tqsdk-python commit and pr
     runs-on: ubuntu-latest
+    if: always() && github.event.client_payload.tag_flag == 'true'
     needs: deploy-on-linux
-    if: github.event.client_payload.tag_flag == 'true'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -355,6 +355,7 @@ jobs:
 
   summary:
     name: summary CI result
+    if: always()
     needs: deploy-on-linux
     runs-on: ubuntu-latest
     steps:
