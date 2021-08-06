@@ -178,6 +178,7 @@ jobs:
         path: ${{ env.TESTLOGPATH }}
 
   deploy-on-linux:
+    if: always()
     needs: test-and-build
     strategy:
       matrix:
