@@ -355,8 +355,7 @@ jobs:
 
   summary:
     name: summary CI result
-    if: always()
-    needs: deploy-on-linux
+    needs: [test-and-build, deploy-on-linux]
     runs-on: ubuntu-latest
     steps:
     - name: Find Comment
