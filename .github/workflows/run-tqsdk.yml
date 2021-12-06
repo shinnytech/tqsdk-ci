@@ -85,10 +85,12 @@ jobs:
           - { name: 'linux-3.7-x64', os: ubuntu-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'linux-3.8-x64', os: ubuntu-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'linux-3.9-x64', os: ubuntu-latest, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.10-x64', os: ubuntu-latest, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'macos-3.6-x64', os: macos-latest, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.7-x64', os: macos-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.8-x64', os: macos-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.9-x64', os: macos-latest, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'macos-3.10-x64', os: macos-latest, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'windows-3.6-x64', os: windows-latest, python-version: 3.6.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
           - { name: 'windows-3.6-x86', os: windows-latest, python-version: 3.6.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
           - { name: 'windows-3.7-x64', os: windows-latest, python-version: 3.7.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
@@ -97,6 +99,8 @@ jobs:
           - { name: 'windows-3.8-x86', os: windows-latest, python-version: 3.8.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
           - { name: 'windows-3.9-x64', os: windows-latest, python-version: 3.9.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
           - { name: 'windows-3.9-x86', os: windows-latest, python-version: 3.9.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
+          - { name: 'windows-3.10-x64', os: windows-latest, python-version: 3.10.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+          - { name: 'windows-3.10-x86', os: windows-latest, python-version: 3.10.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
 
     env:
         PYTHONUNBUFFERED: 1
