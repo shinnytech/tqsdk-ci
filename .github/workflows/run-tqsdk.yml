@@ -102,7 +102,6 @@ jobs:
         PYTHONUNBUFFERED: 1
         PYTHONIOENCODING: "utf-8"
         PYTHONHASHSEED: 32
-        PYTHONWARNINGS: "error,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues"
         TZ: ${{ matrix.envinfo.TZ }}
         TESTLOGPATH: "./log_archive/"
         TESTLOGNAME: ${{ matrix.envinfo.name }}
@@ -166,7 +165,7 @@ jobs:
       shell: bash
       run: |
         pip install pytest-rerunfailures
-        pytest tqsdk/test -W ignore::DeprecationWarning --cov=./tqsdk --cov-report xml:coverage2.xml\
+        pytest tqsdk/test -W error,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues --cov=./tqsdk --cov-report xml:coverage2.xml\
           -m nonparalleltest --disable-warnings\
           --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
           --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
