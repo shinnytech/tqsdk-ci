@@ -141,7 +141,8 @@ jobs:
         git lfs install
         git lfs pull
         python -m pip install wheel==0.34.2
-        python -m pip install --upgrade pip setuptools pytest memory_profiler pytest-cov pytest-xdist
+        python -m pip install setuptools==60.2.0
+        python -m pip install --upgrade pip pytest memory_profiler pytest-cov pytest-xdist
         python -m pip install Sphinx==3.3.1
         python -m pip install -r requirements.txt
     
@@ -222,8 +223,8 @@ jobs:
       run: |
         git lfs install
         git lfs pull
-        python -m pip install --upgrade pip setuptools
         python -m pip install wheel==0.34.2
+        python -m pip install setuptools==60.2.0
         python -m pip install Sphinx==3.3.1
         python -m pip install -r requirements.txt
     
