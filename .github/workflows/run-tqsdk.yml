@@ -138,6 +138,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        python -c "import platform;import sys;print(sys.platform, platform.python_version(), platform.system(), platform.machine());"
         git lfs install
         git lfs pull
         python -m pip install wheel==0.34.2
@@ -146,14 +147,19 @@ jobs:
         python -m pip install Sphinx==3.3.1
         python -m pip install -r requirements.txt
         python -m pip install pytest-rerunfailures
-    
+
+    - name: Install dependencies
+      if: matrix.envinfo.bdist-platform == 'win32' && (matrix.envinfo.python-version == '3.8.x' || matrix.envinfo.python-version == '3.9.x')
+      run: |
+        python -m pip install scipy==1.8.1
+  
     - name: Run test case parallel
       id: test_case_parallel
       if: github.event.client_payload.tag_flag != 'true'
       timeout-minutes: 90
       shell: bash
       env:
-        PYTHONWARNINGS: "error,ignore::FutureWarning:tqsdk.objs_not_entity,ignore::FutureWarning:tqsdk.api,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues"
+        PYTHONWARNINGS: "error,ignore::FutureWarning:tqsdk.api,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues"
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
         pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no -n auto -m "not nonparalleltest" --disable-warnings\
