@@ -237,6 +237,7 @@ jobs:
         python -m pip install setuptools==59.6.0
         python -m pip install Sphinx==3.3.1
         python -m pip install -r requirements.txt
+        python -m pip install scipy
     
     - name: Build bdist wheel 
       shell: bash
