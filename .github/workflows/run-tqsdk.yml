@@ -7,7 +7,7 @@ on:
 jobs:
   setup:
     name: log the workflow url in src repo in pr comment
-    runs-on: buildjet-4vcpu-ubuntu-2004
+    runs-on: ubuntu-20.04
     steps:
     - name: Dump GitHub context
       env:
@@ -45,7 +45,7 @@ jobs:
 
   build-web:
     name: build web packages
-    runs-on: buildjet-4vcpu-ubuntu-2004
+    runs-on: ubuntu-20.04
     needs: setup
     steps:
     - name: Checkout
@@ -81,10 +81,10 @@ jobs:
     strategy:
       matrix:
         envinfo:
-          - { name: 'linux-3.6-x64', os: buildjet-4vcpu-ubuntu-2004, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.7-x64', os: buildjet-4vcpu-ubuntu-2004, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.8-x64', os: buildjet-4vcpu-ubuntu-2004, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.9-x64', os: buildjet-4vcpu-ubuntu-2004, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.6-x64', os: ubuntu-20.04, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.7-x64', os: ubuntu-20.04, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.8-x64', os: ubuntu-20.04, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'macos-3.6-x64', os: macos-latest, python-version: 3.6.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.7-x64', os: macos-latest, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.8-x64', os: macos-latest, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
@@ -194,7 +194,7 @@ jobs:
     strategy:
       matrix:
         envinfo:
-          - { name: 'linux-3.6-x64', os: buildjet-4vcpu-ubuntu-2004, python-version: 3.6.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
+          - { name: 'linux-3.6-x64', os: ubuntu-20.04, python-version: 3.6.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
 
     env:
         PYTHONIOENCODING: "utf-8"
@@ -311,7 +311,7 @@ jobs:
 
   tqsdk-python:
     name: tqsdk-python commit and pr
-    runs-on: buildjet-4vcpu-ubuntu-2004
+    runs-on: ubuntu-20.04
     if: always() && github.event.client_payload.tag_flag == 'true'
     needs: deploy-on-linux
     steps:
@@ -354,7 +354,7 @@ jobs:
   summary:
     name: summary CI result
     needs: [test-and-build, deploy-on-linux]
-    runs-on: buildjet-4vcpu-ubuntu-2004
+    runs-on: ubuntu-20.04
     steps:
     - name: Find Comment
       uses: peter-evans/find-comment@v1
