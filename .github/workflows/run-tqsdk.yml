@@ -221,6 +221,13 @@ jobs:
         python-version: ${{matrix.envinfo.python-version}}
         architecture: ${{matrix.envinfo.python-arch}}
 
+    - name: Setup ossutil
+      uses: yizhoumo/setup-ossutil@v1
+      with:
+        endpoint: "oss-accelerate.aliyuncs.com"
+        access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
+        access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
+
     - name: Cache dependencies
       uses: actions/cache@v1
       with:
@@ -241,14 +248,19 @@ jobs:
     
     - name: Build bdist wheel 
       shell: bash
+      env:
+        SM_REV: 'master/cdb9521'
       run: |
         python setup.py sdist
         python setup.py bdist_wheel -p any
         rm -rf build
+        rm -rf tqsdk/sm && ossutil cp -rf oss://shinny-cd/sm-sdk/$SM_REV/linux/amd64 tqsdk && mv tqsdk/amd64 tqsdk/sm
         python setup.py bdist_wheel -p manylinux1_x86_64
         rm -rf build
+        rm -rf tqsdk/sm && ossutil cp -rf oss://shinny-cd/sm-sdk/$SM_REV/win/x86 tqsdk && mv tqsdk/x86 tqsdk/sm
         python setup.py bdist_wheel -p win32
         rm -rf build
+        rm -rf tqsdk/sm && ossutil cp -rf oss://shinny-cd/sm-sdk/$SM_REV/win/amd64 tqsdk && mv tqsdk/amd64 tqsdk/sm
         python setup.py bdist_wheel -p win_amd64
 
     - name: Sphinx build
@@ -287,14 +299,6 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_PASSWORD }}
-
-    - name: Setup ossutil
-      if: github.event.client_payload.tag_flag == 'true' || github.event.client_payload.ref == 'refs/heads/master'
-      uses: yizhoumo/setup-ossutil@v1
-      with:
-        endpoint: "oss-accelerate.aliyuncs.com"
-        access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
-        access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
 
     - name: Upload to Oss - tag
       if: github.event.client_payload.tag_flag == 'true'
