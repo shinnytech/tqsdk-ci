@@ -240,12 +240,6 @@ jobs:
       run: |
         python setup.py sdist
         python setup.py bdist_wheel -p any
-        rm -rf build
-        python setup.py bdist_wheel -p manylinux1_x86_64
-        rm -rf build
-        python setup.py bdist_wheel -p win32
-        rm -rf build
-        python setup.py bdist_wheel -p win_amd64
 
     - name: Sphinx build
       shell: bash
