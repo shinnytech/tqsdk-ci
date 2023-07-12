@@ -156,7 +156,7 @@ jobs:
         python -m pip install pillow==9.5.0
         python -m pip install scipy==1.8.1
         python -m pip install contourpy==1.0.7
-        python -m pip install matplotlib
+        python -m pip install matplotlib mplcursors
   
     - name: Run test case parallel
       id: test_case_parallel
