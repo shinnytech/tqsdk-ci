@@ -148,12 +148,14 @@ jobs:
       if: matrix.envinfo.bdist-platform != 'win32' || (matrix.envinfo.python-version != '3.8.x' && matrix.envinfo.python-version != '3.9.x')
       run: |
         python -m pip install scipy
+        python -m pip install pandas
 
     - name: Install dependencies on win32
       if: matrix.envinfo.bdist-platform == 'win32' && (matrix.envinfo.python-version == '3.8.x' || matrix.envinfo.python-version == '3.9.x')
       run: |
         python -m pip install scipy==1.8.1
-  
+        python -m pip install pandas==1.2.5
+
     - name: Run test case parallel
       id: test_case_parallel
       if: github.event.client_payload.tag_flag != 'true'
