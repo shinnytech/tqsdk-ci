@@ -56,10 +56,10 @@ jobs:
         token: ${{ secrets.GH_PAT }}
         submodules: 'recursive'
 
-    - name: Setup Node.js 12.x
-      uses: actions/setup-node@v1
+    - name: Setup Node.js 16.x
+      uses: actions/setup-node@v4
       with:
-        node-version: 12.x
+        node-version: 16.x
 
     - name: Package web
       run: |
