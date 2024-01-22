@@ -148,7 +148,7 @@ jobs:
 
     # pandas 在 py>=3.8 时需要安装 pyarrow, 否则报错 DeprecationWarning：Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
     - name: Install dependencies pyarrow
-      if: matrix.envinfo.python-version != '3.7.x'
+      if: matrix.envinfo.bdist-platform != 'win32' && matrix.envinfo.python-version != '3.7.x'
       run: |
         python -m pip install pyarrow
 
