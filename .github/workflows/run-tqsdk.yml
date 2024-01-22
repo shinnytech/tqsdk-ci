@@ -64,6 +64,7 @@ jobs:
     - name: Package web
       run: |
         cd ./web/
+        yarn config set "strict-ssl" false -g
         yarn install --frozen-lockfile
         yarn run build
       env:
