@@ -170,7 +170,7 @@ jobs:
       timeout-minutes: 90
       shell: bash
       env:
-        PYTHONWARNINGS: "error,ignore::FutureWarning:tqsdk.api,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues,ignore::DeprecationWarning:pandas.core.frame"
+        PYTHONWARNINGS: "error,ignore::FutureWarning:tqsdk.api,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues"
       run: |
         mkdir -p ${{ env.TESTLOGPATH }}
         pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no -n auto -m "not nonparalleltest" --disable-warnings\
