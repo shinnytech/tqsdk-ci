@@ -25,7 +25,7 @@ jobs:
           - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
@@ -49,7 +49,7 @@ jobs:
     needs: setup
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
@@ -120,7 +120,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
@@ -133,7 +133,7 @@ jobs:
         path: ./tqsdk/web
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{matrix.envinfo.python-version}}
         architecture: ${{matrix.envinfo.python-arch}}
@@ -220,7 +220,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: shinnytech/tqsdk-python-private
         ref: ${{ github.event.client_payload.ref }}
@@ -233,7 +233,7 @@ jobs:
         path: ./tqsdk/web
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{matrix.envinfo.python-version}}
         architecture: ${{matrix.envinfo.python-arch}}
@@ -328,7 +328,7 @@ jobs:
     needs: deploy-on-linux
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: shinnytech/tqsdk-python
         ref: master
