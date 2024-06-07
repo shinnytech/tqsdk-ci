@@ -85,16 +85,16 @@ jobs:
           - { name: 'linux-3.7-x64', os: ubuntu-20.04, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'linux-3.8-x64', os: ubuntu-20.04, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.10-x64', os: ubuntu-20.04, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.11-x64', os: ubuntu-20.04, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'linux-3.12-x64', os: ubuntu-20.04, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
           - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, TZ: '', bdist-platform: 'manylinux1_x86_64'}
-#          - { name: 'macos-3.7-x64', os: macos-13, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-#          - { name: 'macos-3.8-x64', os: macos-13, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'linux-3.10-x64', os: ubuntu-20.04, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+#          - { name: 'linux-3.11-x64', os: ubuntu-20.04, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+#          - { name: 'linux-3.12-x64', os: ubuntu-20.04, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
+          - { name: 'macos-3.7-x64', os: macos-13, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+          - { name: 'macos-3.8-x64', os: macos-13, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.9-x64', os: macos-13, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'macos-3.10-x64', os: macos-13, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'macos-3.11-x64', os: macos-latest, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'macos-3.12-x64', os: macos-latest, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+#          - { name: 'macos-3.11-x64', os: macos-latest, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
+#          - { name: 'macos-3.12-x64', os: macos-latest, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
           - { name: 'windows-3.7-x64', os: windows-latest, python-version: 3.7.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
           - { name: 'windows-3.7-x86', os: windows-latest, python-version: 3.7.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
           - { name: 'windows-3.8-x64', os: windows-latest, python-version: 3.8.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
@@ -103,10 +103,12 @@ jobs:
           - { name: 'windows-3.9-x86', os: windows-latest, python-version: 3.9.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
           - { name: 'windows-3.10-x64', os: windows-latest, python-version: 3.10.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
 #          - { name: 'windows-3.10-x86', os: windows-latest, python-version: 3.10.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-          - { name: 'windows-3.11-x64', os: windows-latest, python-version: 3.11.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+#          - { name: 'windows-3.11-x64', os: windows-latest, python-version: 3.11.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
 #          - { name: 'windows-3.11-x86', os: windows-latest, python-version: 3.11.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-          - { name: 'windows-3.12-x64', os: windows-latest, python-version: 3.12.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
+#          - { name: 'windows-3.12-x64', os: windows-latest, python-version: 3.12.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
 #          - { name: 'windows-3.12-x86', os: windows-latest, python-version: 3.12.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
+# py11 py12 默认的 hash 算法改变，导致测试脚本需要变更，暂时不加在 ci 中，后续计划只在 py11 py12 上运行 ci，需要重新录制脚本
+
 
     env:
         PYTHONUNBUFFERED: 1
