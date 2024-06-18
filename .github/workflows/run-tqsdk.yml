@@ -90,6 +90,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -c "import platform;import sys;print(sys.platform, platform.python_version(), platform.system(), platform.machine());"
+          python -m pip install setuptools
           python setup.py install
           python -m pip install notebook
 
