@@ -91,11 +91,12 @@ jobs:
         run: |
           python -c "import platform;import sys;print(sys.platform, platform.python_version(), platform.system(), platform.machine());"
           python -m pip install setuptools
-          python setup.py install
+          python -m pip install -r requirements.txt
           python -m pip install notebook
 
       - name: Run Jupyter
         run: |
+          export PYTHONPATH="/home/runner/work/tqsdk-python-private"
           jupyter nbconvert --execute tqsdk/test/notebooks/demo.ipynb --to markdown
 
   build-web:
