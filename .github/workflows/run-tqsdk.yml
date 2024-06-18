@@ -96,7 +96,8 @@ jobs:
 
       - name: Run Jupyter
         run: |
-          export PYTHONPATH="/home/runner/work/tqsdk-python-private"
+          export PYTHONPATH="/home/runner/work/tqsdk-ci/tqsdk-ci/"
+          echo $PYTHONPATH
           jupyter nbconvert --execute tqsdk/test/notebooks/demo.ipynb --to markdown
 
   build-web:
