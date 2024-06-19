@@ -113,10 +113,19 @@ jobs:
           python -m pip install pandas==1.2.5
 
       - name: Run Jupyter
+        if: matrix.envinfo.bdist-platform != 'win_amd64'
         run: |
-          export PYTHONPATH="/home/runner/work/tqsdk-ci/tqsdk-ci/"
-          echo $PYTHONPATH
+          target_dir=$(pwd)
+          export PYTHONPATH="$target_dir"
+          echo "PYTHONPATH is set to $PYTHONPATH"
           jupyter nbconvert --execute tqsdk/test/notebooks/demo.ipynb --to markdown
+
+      - name: Run Jupyter on Windows
+        if: matrix.envinfo.bdist-platform == 'win_amd64'
+        run: |
+          $env:PYTHONPATH = "D:\a\tqsdk-ci\tqsdk-ci"
+          Write-Output "PYTHONPATH is set to $env:PYTHONPATH"
+          jupyter nbconvert --execute "tqsdk/test/notebooks/demo.ipynb" --to markdown
 
   build-web:
     name: build web packages
