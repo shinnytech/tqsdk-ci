@@ -213,7 +213,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: web-files
           path: ./tqsdk/web
@@ -319,7 +319,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: web-files
           path: ./tqsdk/web
@@ -429,13 +429,13 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: Download doc
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: doc-files
           path: ./doc
 
       - name: Download sdist
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: sdist-file
           path: ../
