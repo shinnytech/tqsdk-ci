@@ -155,7 +155,7 @@ jobs:
           CI: true
 
       - name: Upload web package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: web-files
           path: tqsdk/web/*
@@ -292,7 +292,7 @@ jobs:
 
       - name: Upload log to artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TESTLOGNAME }}
           path: ${{ env.TESTLOGPATH }}
@@ -364,25 +364,25 @@ jobs:
           sphinx-build doc build/doc
 
       - name: Upload bdist package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: bdist-file
           path: dist/*.whl
 
       - name: Upload sdist package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: sdist-file
           path: dist/*.tar.gz
 
       - name: Upload doc package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: doc
           path: build/doc
 
       - name: Upload doc-files package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: doc-files
           path: doc/*
