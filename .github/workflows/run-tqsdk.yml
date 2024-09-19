@@ -91,7 +91,6 @@ jobs:
         run: |
           python -c "import platform;import sys;print(sys.platform, platform.python_version(), platform.system(), platform.machine());"
           python -m pip install setuptools
-          python -m pip install -r requirements.txt
           python -m pip install notebook
 
       # pandas 在 py>=3.8 时需要安装 pyarrow, 否则报错 DeprecationWarning：Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
@@ -111,6 +110,10 @@ jobs:
         run: |
           python -m pip install scipy==1.8.1
           python -m pip install pandas==1.2.5
+
+      - name: Install dependencies from requirements.txt
+        run: |
+          python -m pip install -r requirements.txt
 
       - name: Run Jupyter
         if: matrix.envinfo.bdist-platform != 'win_amd64'
@@ -246,7 +249,6 @@ jobs:
           python -m pip install setuptools
           python -m pip install --upgrade pip pytest memory_profiler pytest-cov pytest-xdist
           python -m pip install Sphinx==3.3.1
-          python -m pip install -r requirements.txt
           python -m pip install pytest-rerunfailures
 
       # pandas 在 py>=3.8 时需要安装 pyarrow, 否则报错 DeprecationWarning：Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
@@ -266,6 +268,10 @@ jobs:
         run: |
           python -m pip install scipy==1.8.1
           python -m pip install pandas==1.2.5
+
+      - name: Install dependencies from requirements.txt
+        run: |
+          python -m pip install -r requirements.txt
 
       - name: Run test case parallel
         id: test_case_parallel
@@ -345,11 +351,11 @@ jobs:
           python -m pip install wheel==0.34.2
           python -m pip install setuptools==59.6.0
           python -m pip install Sphinx==3.3.1
-          python -m pip install -r requirements.txt
           python -m pip install scipy
           python -m pip install pandas
           sudo apt install pandoc
           pip install pandoc
+          python -m pip install -r requirements.txt
 
       - name: Build bdist wheel
         shell: bash
