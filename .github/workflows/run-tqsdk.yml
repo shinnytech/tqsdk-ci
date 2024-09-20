@@ -204,6 +204,7 @@ jobs:
       TZ: ${{ matrix.envinfo.TZ }}
       TESTLOGPATH: "./log_archive/"
       TESTLOGNAME: ${{ matrix.envinfo.name }}
+      TQSDK_RUN_TEST: true
 
     runs-on: ${{ matrix.envinfo.os }}
 
