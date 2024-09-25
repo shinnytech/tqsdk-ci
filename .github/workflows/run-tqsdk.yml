@@ -99,12 +99,6 @@ jobs:
         run: |
           python -m pip install pyarrow
 
-      - name: Install dependencies on others
-        if: matrix.envinfo.bdist-platform != 'win32' || (matrix.envinfo.python-version != '3.8.x' && matrix.envinfo.python-version != '3.9.x')
-        run: |
-          python -m pip install scipy
-          python -m pip install pandas
-
       - name: Install dependencies on win32
         if: matrix.envinfo.bdist-platform == 'win32' && (matrix.envinfo.python-version == '3.8.x' || matrix.envinfo.python-version == '3.9.x')
         run: |
@@ -258,12 +252,6 @@ jobs:
         run: |
           python -m pip install pyarrow
 
-      - name: Install dependencies on others
-        if: matrix.envinfo.bdist-platform != 'win32' || (matrix.envinfo.python-version != '3.8.x' && matrix.envinfo.python-version != '3.9.x')
-        run: |
-          python -m pip install scipy
-          python -m pip install pandas
-
       - name: Install dependencies on win32
         if: matrix.envinfo.bdist-platform == 'win32' && (matrix.envinfo.python-version == '3.8.x' || matrix.envinfo.python-version == '3.9.x')
         run: |
@@ -352,8 +340,6 @@ jobs:
           python -m pip install wheel==0.34.2
           python -m pip install setuptools==59.6.0
           python -m pip install Sphinx==3.3.1
-          python -m pip install scipy
-          python -m pip install pandas
           sudo apt install pandoc
           pip install pandoc
           python -m pip install -r requirements.txt
