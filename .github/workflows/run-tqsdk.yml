@@ -91,6 +91,8 @@ jobs:
         run: |
           python -c "import platform;import sys;print(sys.platform, platform.python_version(), platform.system(), platform.machine());"
           python -m pip install setuptools
+          # notebook 依赖的 pywinpty 库在 maturin == 1.8.0 版本上编译失败，暂时使用 1.7.8 版本
+          python -m pip install maturin==1.7.8
           python -m pip install notebook
 
       # pandas 在 py>=3.8 时需要安装 pyarrow, 否则报错 DeprecationWarning：Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
