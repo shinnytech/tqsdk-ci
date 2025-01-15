@@ -1,8 +1,7 @@
 name: CI for tqsdk-python-private
 
 on:
-  repository_dispatch:
-    types: [ run-ci-* ]
+  push:
 
 jobs:
   setup:
@@ -19,8 +18,8 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
-          issue-number: ${{ github.event.client_payload.pr_number }}
-          comment-id: ${{ github.event.client_payload.comment_id }}
+          issue-number: "7"
+          comment-id: "2589164960"
           body: |
             - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
@@ -28,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          ref: "refs/heads/master"
           token: ${{ secrets.GH_PAT }}
 
       - name: Giant Files List
@@ -43,87 +42,6 @@ jobs:
           echo "files size check failed"
           exit 1
 
-  run-jupyter:
-    name: test for jupyter
-    needs: setup
-    strategy:
-      matrix:
-        envinfo:
-          - { name: 'linux-3.7-x64', os: ubuntu-20.04, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.8-x64', os: ubuntu-20.04, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.10-x64', os: ubuntu-20.04, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.11-x64', os: ubuntu-20.04, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.12-x64', os: ubuntu-20.04, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'macos-3.7-x64', os: macos-13, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.8-x64', os: macos-13, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.9-x64', os: macos-13, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.10-x64', os: macos-13, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.11-x64', os: macos-latest, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.12-x64', os: macos-latest, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'windows-3.7-x64', os: windows-latest, python-version: 3.7.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.8-x64', os: windows-latest, python-version: 3.8.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.9-x64', os: windows-latest, python-version: 3.9.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.10-x64', os: windows-latest, python-version: 3.10.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.11-x64', os: windows-latest, python-version: 3.11.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.12-x64', os: windows-latest, python-version: 3.12.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-    env:
-      PYTHONUNBUFFERED: 1
-      PYTHONIOENCODING: "utf-8"
-      PYTHONHASHSEED: 32
-      TZ: ${{ matrix.envinfo.TZ }}
-    runs-on: ${{ matrix.envinfo.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.envinfo.python-version}}
-          architecture: ${{matrix.envinfo.python-arch}}
-
-      - name: Install dependencies
-        run: |
-          python -c "import platform;import sys;print(sys.platform, platform.python_version(), platform.system(), platform.machine());"
-          python -m pip install setuptools
-          python -m pip install notebook
-
-      # pandas 在 py>=3.8 时需要安装 pyarrow, 否则报错 DeprecationWarning：Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
-      - name: Install dependencies pyarrow
-        if: matrix.envinfo.bdist-platform != 'win32' && matrix.envinfo.python-version != '3.7.x'
-        run: |
-          python -m pip install pyarrow
-
-      - name: Install dependencies on win32
-        if: matrix.envinfo.bdist-platform == 'win32' && (matrix.envinfo.python-version == '3.8.x' || matrix.envinfo.python-version == '3.9.x')
-        run: |
-          python -m pip install scipy==1.8.1
-          python -m pip install pandas==1.2.5
-
-      - name: Install dependencies from requirements.txt
-        run: |
-          python -m pip install -r requirements.txt
-
-      - name: Run Jupyter
-        if: matrix.envinfo.bdist-platform != 'win_amd64'
-        run: |
-          target_dir=$(pwd)
-          export PYTHONPATH="$target_dir"
-          echo "PYTHONPATH is set to $PYTHONPATH"
-          jupyter nbconvert --execute tqsdk/test/notebooks/demo.ipynb --to markdown
-
-      - name: Run Jupyter on Windows
-        if: matrix.envinfo.bdist-platform == 'win_amd64'
-        run: |
-          $env:PYTHONPATH = "D:\a\tqsdk-ci\tqsdk-ci"
-          Write-Output "PYTHONPATH is set to $env:PYTHONPATH"
-          jupyter nbconvert --execute "tqsdk/test/notebooks/demo.ipynb" --to markdown
-
   build-web:
     name: build web packages
     runs-on: ubuntu-20.04
@@ -133,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          ref: "refs/heads/master"
           token: ${{ secrets.GH_PAT }}
           submodules: 'recursive'
 
@@ -159,7 +77,6 @@ jobs:
 
   test-and-build:
     needs: build-web
-    if: github.event.client_payload.tag_flag != 'true'
     strategy:
       matrix:
         envinfo:
@@ -207,7 +124,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          ref: "refs/heads/master"
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
@@ -262,20 +179,18 @@ jobs:
 
       - name: Run test case parallel
         id: test_case_parallel
-        if: github.event.client_payload.tag_flag != 'true'
         timeout-minutes: 90
         shell: bash
         env:
           PYTHONWARNINGS: "error,ignore::FutureWarning:tqsdk.api,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues,ignore::DeprecationWarning:setuptools"
         run: |
           mkdir -p ${{ env.TESTLOGPATH }}
-          pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no -n auto -m "not nonparalleltest" --disable-warnings\
+          pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no -n 2 -m "not nonparalleltest" --disable-warnings\
             --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
             --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
       - name: Run test case
         id: test_case_nonparallel
-        if: github.event.client_payload.tag_flag != 'true'
         timeout-minutes: 90
         shell: bash
         run: |
@@ -289,185 +204,3 @@ jobs:
         with:
           name: ${{ env.TESTLOGNAME }}
           path: ${{ env.TESTLOGPATH }}
-
-  deploy-on-linux:
-    if: always()
-    needs: test-and-build
-    strategy:
-      matrix:
-        envinfo:
-          - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, bdist-platform: 'linux_x86_64' }
-
-    env:
-      PYTHONIOENCODING: "utf-8"
-
-    runs-on: ${{ matrix.envinfo.os }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Download web-files
-        uses: actions/download-artifact@v4
-        with:
-          name: web-files
-          path: ./tqsdk/web
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.envinfo.python-version}}
-          architecture: ${{matrix.envinfo.python-arch}}
-
-      - name: Cache dependencies
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ matrix.envinfo.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ matrix.envinfo.os }}-pip-
-
-      - name: Install dependencies
-        run: |
-          git lfs install
-          git lfs pull
-          python -m pip install wheel==0.34.2
-          python -m pip install setuptools==59.6.0
-          python -m pip install Sphinx==3.3.1
-          sudo apt install pandoc
-          python -m pip install -r requirements.txt
-
-      - name: Build bdist wheel
-        shell: bash
-        run: |
-          python setup.py sdist
-          python setup.py bdist_wheel -p any
-
-      - name: Sphinx build
-        shell: bash
-        run: |
-          rm -rf build
-          sphinx-build doc build/doc
-
-      - name: Upload bdist package
-        uses: actions/upload-artifact@v4
-        with:
-          name: bdist-file
-          path: dist/*.whl
-
-      - name: Upload sdist package
-        uses: actions/upload-artifact@v4
-        with:
-          name: sdist-file
-          path: dist/*.tar.gz
-
-      - name: Upload doc package
-        uses: actions/upload-artifact@v4
-        with:
-          name: doc
-          path: build/doc
-
-      - name: Upload doc-files package
-        uses: actions/upload-artifact@v4
-        with:
-          name: doc-files
-          path: doc/*
-
-      - name: Publish to pypi
-        if: github.event.client_payload.tag_flag == 'true'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
-
-      - name: Setup ossutil
-        if: github.event.client_payload.tag_flag == 'true' || github.event.client_payload.ref == 'refs/heads/master'
-        uses: yizhoumo/setup-ossutil@v1
-        with:
-          endpoint: "oss-accelerate.aliyuncs.com"
-          access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
-          access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
-
-      - name: Upload to Oss - tag
-        if: github.event.client_payload.tag_flag == 'true'
-        shell: bash
-        run: |
-          ossutil cp -rf build/doc oss://shinnydoc/tqsdk/${{github.event.client_payload.tag_name}}/
-
-      - name: Upload to Oss - master
-        if: github.event.client_payload.ref == 'refs/heads/master'
-        shell: bash
-        run: |
-          ossutil cp -rf build/doc oss://shinnydoc/tqsdk/master/
-          ossutil cp -rf build/doc oss://shinnydoc/tqsdk/latest/
-
-  tqsdk-python:
-    name: tqsdk-python commit and pr
-    runs-on: ubuntu-20.04
-    if: always() && github.event.client_payload.tag_flag == 'true'
-    needs: deploy-on-linux
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: shinnytech/tqsdk-python
-          ref: master
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Download doc
-        uses: actions/download-artifact@v4
-        with:
-          name: doc-files
-          path: ./doc
-
-      - name: Download sdist
-        uses: actions/download-artifact@v4
-        with:
-          name: sdist-file
-          path: ../
-
-      - name: unzip
-        shell: bash
-        run: |
-          cd ..
-          tar -x -f *.tar.gz
-          cp -R tqsdk-${{github.event.client_payload.tag_name}}/* tqsdk-ci
-          cd tqsdk-ci
-          git status
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GH_PAT }}
-          commit-message: "Update Version ${{ github.event.client_payload.tag_name }}"
-          branch-suffix: short-commit-hash
-          title: '[Tqsdk-Ci] Update Version ${{ github.event.client_payload.tag_name }}'
-
-  summary:
-    name: summary CI result
-    needs: [ test-and-build, deploy-on-linux ]
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Find Comment
-        uses: peter-evans/find-comment@v1
-        id: fc
-        with:
-          repository: shinnytech/tqsdk-python-private
-          token: ${{ secrets.GH_PAT }}
-          issue-number: ${{ github.event.client_payload.pr_number }}
-          body-includes: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
-
-      - name: Add comment show success
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.GH_PAT }}
-          repository: shinnytech/tqsdk-python-private
-          issue-number: ${{ github.event.client_payload.pr_number }}
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          body: |
-            workflow ${{ github.run_id }} run success!
-          reactions: '+1'
