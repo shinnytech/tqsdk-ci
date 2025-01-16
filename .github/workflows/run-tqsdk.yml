@@ -18,8 +18,8 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
-          issue-number: "7"
-          comment-id: "2589164960"
+          issue-number: "715"
+          comment-id: "2594391015"
           body: |
             - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: "refs/heads/master"
+          ref: "chenli/profile_memory_during_ci"
           token: ${{ secrets.GH_PAT }}
 
       - name: Giant Files List
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: "refs/heads/master"
+          ref: "chenli/profile_memory_during_ci"
           token: ${{ secrets.GH_PAT }}
           submodules: 'recursive'
 
@@ -124,7 +124,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: "refs/heads/master"
+          ref: "chenli/profile_memory_during_ci"
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
@@ -181,11 +181,9 @@ jobs:
         id: test_case_parallel
         timeout-minutes: 90
         shell: bash
-        env:
-          PYTHONWARNINGS: "error,ignore::FutureWarning:tqsdk.api,ignore::DeprecationWarning:tqsdk.channel,ignore::DeprecationWarning:asyncio.queues,ignore::DeprecationWarning:setuptools"
         run: |
           mkdir -p ${{ env.TESTLOGPATH }}
-          pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no -n 2 -m "not nonparalleltest" --disable-warnings\
+          pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage1.xml --show-capture=no -n auto -m "not nonparalleltest" --disable-warnings\
             --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
             --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
