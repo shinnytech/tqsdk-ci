@@ -1,8 +1,9 @@
 name: CI for tqsdk-python-private
+run-name: ${{ github.event.client_payload.title }}
 
 on:
   repository_dispatch:
-    types: [ run-ci-* ]
+    types: [ run-tqsdk-ci ]
 
 jobs:
   setup:
