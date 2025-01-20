@@ -1,5 +1,4 @@
 name: CI for tqsdk-python-private
-run-name: "2594391015 \n hhhhhhh"
 
 on:
   push:
@@ -7,7 +6,7 @@ on:
 jobs:
   setup:
     name: log the workflow url in src repo in pr comment
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-20.04 
     steps:
       - name: Dump GitHub context
         env:
@@ -20,7 +19,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
           issue-number: "715"
-          comment-id: "2594391015"
+          comment-id: "2602058028"
           body: |
             - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
