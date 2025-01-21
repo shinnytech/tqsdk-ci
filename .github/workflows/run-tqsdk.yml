@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
           issue-number: "715"
-          comment-id: "2602534734"
+          comment-id: "2603534013"
           body: |
             - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
