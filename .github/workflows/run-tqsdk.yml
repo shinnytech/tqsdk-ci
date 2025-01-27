@@ -18,8 +18,8 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
-          issue-number: "715"
-          comment-id: "2603534013"
+          issue-number: "720"
+          comment-id: "2614907710"
           body: |
             - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: "chenli/profile_memory_during_ci"
+          ref: "chenli/test_macos_ci"
           token: ${{ secrets.GH_PAT }}
 
       - name: Giant Files List
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: "chenli/profile_memory_during_ci"
+          ref: "chenli/test_macos_ci"
           token: ${{ secrets.GH_PAT }}
           submodules: 'recursive'
 
@@ -80,33 +80,10 @@ jobs:
     strategy:
       matrix:
         envinfo:
-          - { name: 'linux-3.7-x64', os: ubuntu-20.04, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.8-x64', os: ubuntu-20.04, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.9-x64', os: ubuntu-20.04, python-version: 3.9.x, python-arch: x64, TZ: '', bdist-platform: 'manylinux1_x86_64' }
-          - { name: 'linux-3.10-x64', os: ubuntu-20.04, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
-          #          - { name: 'linux-3.11-x64', os: ubuntu-20.04, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          #          - { name: 'linux-3.12-x64', os: ubuntu-20.04, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64'}
-          - { name: 'macos-3.7-x64', os: macos-13, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.8-x64', os: macos-13, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
+          # - { name: 'macos-3.7-x64', os: macos-13, python-version: 3.7.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
+          # - { name: 'macos-3.8-x64', os: macos-13, python-version: 3.8.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
           - { name: 'macos-3.9-x64', os: macos-13, python-version: 3.9.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          - { name: 'macos-3.10-x64', os: macos-13, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
-          #          - { name: 'macos-3.11-x64', os: macos-latest, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          #          - { name: 'macos-3.12-x64', os: macos-latest, python-version: 3.12.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any'}
-          - { name: 'windows-3.7-x64', os: windows-latest, python-version: 3.7.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.7-x86', os: windows-latest, python-version: 3.7.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32' }
-          - { name: 'windows-3.8-x64', os: windows-latest, python-version: 3.8.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.8-x86', os: windows-latest, python-version: 3.8.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32' }
-          - { name: 'windows-3.9-x64', os: windows-latest, python-version: 3.9.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-          - { name: 'windows-3.9-x86', os: windows-latest, python-version: 3.9.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32' }
-          - { name: 'windows-3.10-x64', os: windows-latest, python-version: 3.10.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64' }
-    #          - { name: 'windows-3.10-x86', os: windows-latest, python-version: 3.10.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-    #          - { name: 'windows-3.11-x64', os: windows-latest, python-version: 3.11.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
-    #          - { name: 'windows-3.11-x86', os: windows-latest, python-version: 3.11.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-    #          - { name: 'windows-3.12-x64', os: windows-latest, python-version: 3.12.x, python-arch: x64, TZ: 'CST-8', bdist-platform: 'win_amd64'}
-    #          - { name: 'windows-3.12-x86', os: windows-latest, python-version: 3.12.x, python-arch: x86, TZ: 'CST-8', bdist-platform: 'win32'}
-    # py11 py12 默认的 hash 算法改变，导致测试脚本需要变更，暂时不加在 ci 中，后续计划只在 py11 py12 上运行 ci，需要重新录制脚本
-
+          # - { name: 'macos-3.10-x64', os: macos-13, python-version: 3.10.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'any' }
 
     env:
       PYTHONUNBUFFERED: 1
@@ -124,7 +101,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shinnytech/tqsdk-python-private
-          ref: "chenli/profile_memory_during_ci"
+          ref: "chenli/test_macos_ci"
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
@@ -161,7 +138,6 @@ jobs:
           python -m pip install setuptools
           python -m pip install Sphinx==3.3.1
 
-      # pandas 在 py>=3.8 时需要安装 pyarrow, 否则报错 DeprecationWarning：Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
       - name: Install dependencies pyarrow
         if: matrix.envinfo.bdist-platform != 'win32' && matrix.envinfo.python-version != '3.7.x'
         run: |
@@ -177,6 +153,17 @@ jobs:
         run: |
           python -m pip install -r requirements.txt
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          detached: true
+
+      - name: Start system monitor
+        run: |
+          nohup python monitor_system.py & 
+          echo $! > monitor.pid  
+
       - name: Run test case parallel
         id: test_case_parallel
         timeout-minutes: 90
@@ -187,17 +174,27 @@ jobs:
             --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
             --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
-      - name: Run test case
-        id: test_case_nonparallel
-        timeout-minutes: 90
-        shell: bash
+      # - name: Run test case
+      #   id: test_case_nonparallel
+      #   timeout-minutes: 90
+      #   shell: bash
+      #   run: |
+      #     pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage2.xml -m nonparalleltest --disable-warnings\
+      #       --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
+      #       --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
+
+      - name: Stop system monitor
         run: |
-          pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage2.xml -m nonparalleltest --disable-warnings\
-            --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
-            --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
+          kill -TERM $(cat monitor.pid)
+          zip system_status.zip system_status.log
 
       - name: Upload log to artifact
-        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: system_status_log
+          path: ./system_status.zip
+
+      - name: Upload log to artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TESTLOGNAME }}
