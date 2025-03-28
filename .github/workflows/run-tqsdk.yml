@@ -344,6 +344,21 @@ jobs:
           sudo apt install pandoc
           python -m pip install -r requirements.txt
 
+      - name: edit setup.py to support shinny-pip
+        if: github.event.client_payload.pr_flag == 'true'
+        shell: bash
+        env:
+          PAYLOAD_SHA: ${{ github.event.client_payload.sha }}
+          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+        run: |
+          version_pattern="version\s*=\s*['\"].*['\"]"
+          short_sha=${PAYLOAD_SHA:0:7}
+          ref_name=${PAYLOAD_REF##*/}
+          new_version="0.0.0+${ref_name}.$short_sha"
+          sed -i "s|$version_pattern|version = \"$new_version\"|" setup.py
+          dest_dir=${ref_name}/$short_sha/
+          echo "DEST_DIR=$dest_dir" >> $GITHUB_ENV
+
       - name: Build bdist wheel
         shell: bash
         run: |
@@ -411,25 +426,8 @@ jobs:
       - name: Upload to Oss - pr 
         if: github.event.client_payload.pr_flag == 'true'
         shell: bash
-        env:
-          PAYLOAD_SHA: ${{ github.event.client_payload.sha }}
-          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
         run: |
-          cp setup.py setup.py.bak
-          
-          version_pattern="version\s*=\s*['\"].*['\"]"
-          short_sha=${PAYLOAD_SHA:0:7}
-          ref_name=${PAYLOAD_REF##*/}
-          new_version="0.0.0+${ref_name}.$short_sha"
-          sed -i "s|$version_pattern|version = \"$new_version\"|" setup.py
-          
-          python setup.py bdist_wheel -p any
-          
-          dest_dir=${ref_name}/$short_sha/
-          wheel_file=$(ls dist/tqsdk-0.0.0*.whl)
-          ossutil cp -f "$wheel_file" oss://shinny-cd/tqsdk/"$dest_dir"dist/
-          
-          mv setup.py.bak setup.py
+          ossutil cp -f dist/*.whl oss://shinny-cd/tqsdk/"$DEST_DIR"dist/
 
   tqsdk-python:
     name: tqsdk-python commit and pr
