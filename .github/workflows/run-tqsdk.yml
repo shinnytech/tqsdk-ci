@@ -1,35 +1,143 @@
 name: CI for tqsdk-python-private
-run-name: ${{ github.event.client_payload.title }}
+run-name: ${{ github.event.client_payload.title || github.event.head_commit.message || 'Manual CI Trigger' }}
 
 on:
   repository_dispatch:
     types: [ run-tqsdk-ci ]
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      tqsdk_ci_ref:
+        description: 'tqsdk-ci repository branch/ref to use'
+        required: false
+        default: 'master'
+        type: string
+      tqsdk_python_ref:
+        description: 'tqsdk-python-private repository branch/ref to test'
+        required: false
+        default: 'master'
+        type: string
+      test_type:
+        description: 'Test type to run'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+        - full
+        - jupyter-only
+        - build-only
+        - test-only
+      tag_flag:
+        description: 'Is this a tag release?'
+        required: false
+        default: false
+        type: boolean
+      debug_mode:
+        description: 'Enable debug logging'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   setup:
-    name: log the workflow url in src repo in pr comment
+    name: setup and determine parameters
     runs-on: ubuntu-22.04
+    outputs:
+      target_repository: ${{ steps.set-vars.outputs.target_repository }}
+      target_ref: ${{ steps.set-vars.outputs.target_ref }}
+      ci_ref: ${{ steps.set-vars.outputs.ci_ref }}
+      is_tag_release: ${{ steps.set-vars.outputs.is_tag_release }}
+      pr_number: ${{ steps.set-vars.outputs.pr_number }}
+      comment_id: ${{ steps.set-vars.outputs.comment_id }}
+      test_type: ${{ steps.set-vars.outputs.test_type }}
+      debug_mode: ${{ steps.set-vars.outputs.debug_mode }}
+      pr_flag: ${{ steps.set-vars.outputs.pr_flag }}
+      sha: ${{ steps.set-vars.outputs.sha }}
+      tag_name: ${{ steps.set-vars.outputs.tag_name }}
     steps:
+      - name: Set variables based on trigger type
+        id: set-vars
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "target_repository=shinnytech/tqsdk-python-private" >> $GITHUB_OUTPUT
+            echo "target_ref=${{ github.event.client_payload.ref }}" >> $GITHUB_OUTPUT
+            echo "ci_ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+            echo "is_tag_release=${{ github.event.client_payload.tag_flag }}" >> $GITHUB_OUTPUT
+            echo "pr_number=${{ github.event.client_payload.pr_number }}" >> $GITHUB_OUTPUT
+            echo "comment_id=${{ github.event.client_payload.comment_id }}" >> $GITHUB_OUTPUT
+            echo "test_type=full" >> $GITHUB_OUTPUT
+            echo "debug_mode=false" >> $GITHUB_OUTPUT
+            echo "pr_flag=${{ github.event.client_payload.pr_flag }}" >> $GITHUB_OUTPUT
+            echo "sha=${{ github.event.client_payload.sha }}" >> $GITHUB_OUTPUT
+            echo "tag_name=${{ github.event.client_payload.tag_name }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "target_repository=shinnytech/tqsdk-python-private" >> $GITHUB_OUTPUT
+            echo "target_ref=${{ github.event.inputs.tqsdk_python_ref }}" >> $GITHUB_OUTPUT
+            echo "ci_ref=${{ github.event.inputs.tqsdk_ci_ref }}" >> $GITHUB_OUTPUT
+            echo "is_tag_release=${{ github.event.inputs.tag_flag }}" >> $GITHUB_OUTPUT
+            echo "pr_number=" >> $GITHUB_OUTPUT
+            echo "comment_id=" >> $GITHUB_OUTPUT
+            echo "test_type=${{ github.event.inputs.test_type }}" >> $GITHUB_OUTPUT
+            echo "debug_mode=${{ github.event.inputs.debug_mode }}" >> $GITHUB_OUTPUT
+            echo "pr_flag=false" >> $GITHUB_OUTPUT
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "tag_name=" >> $GITHUB_OUTPUT
+          else
+            # For push/pull_request on current repository
+            echo "target_repository=${{ github.repository }}" >> $GITHUB_OUTPUT
+            echo "target_ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+            echo "ci_ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+            echo "is_tag_release=false" >> $GITHUB_OUTPUT
+            echo "pr_number=${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "comment_id=" >> $GITHUB_OUTPUT
+            echo "test_type=full" >> $GITHUB_OUTPUT
+            echo "debug_mode=false" >> $GITHUB_OUTPUT
+            echo "pr_flag=false" >> $GITHUB_OUTPUT
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "tag_name=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout tqsdk-ci repository
+        uses: actions/checkout@v4
+        with:
+          repository: shinnytech/tqsdk-ci
+          ref: ${{ steps.set-vars.outputs.ci_ref }}
+          token: ${{ secrets.GH_PAT }}
+          path: tqsdk-ci
+
       - name: Dump GitHub context
+        if: steps.set-vars.outputs.debug_mode == 'true'
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: Add comment show workflow url
+      - name: Display selected parameters
+        run: |
+          echo "Trigger type: ${{ github.event_name }}"
+          echo "Target repository: ${{ steps.set-vars.outputs.target_repository }}"
+          echo "Target ref: ${{ steps.set-vars.outputs.target_ref }}"
+          echo "CI ref: ${{ steps.set-vars.outputs.ci_ref }}"
+          echo "Test type: ${{ steps.set-vars.outputs.test_type }}"
+          echo "Tag release: ${{ steps.set-vars.outputs.is_tag_release }}"
+          echo "Debug mode: ${{ steps.set-vars.outputs.debug_mode }}"
+
+      - name: Add comment show workflow url (external trigger only)
+        if: github.event_name == 'repository_dispatch' && steps.set-vars.outputs.pr_number != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
-          issue-number: ${{ github.event.client_payload.pr_number }}
-          comment-id: ${{ github.event.client_payload.comment_id }}
+          issue-number: ${{ steps.set-vars.outputs.pr_number }}
+          comment-id: ${{ steps.set-vars.outputs.comment_id }}
           body: |
             - Workflow url: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
-      - name: Checkout
+      - name: Checkout target repository
         uses: actions/checkout@v4
         with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          repository: ${{ steps.set-vars.outputs.target_repository }}
+          ref: ${{ steps.set-vars.outputs.target_ref }}
           token: ${{ secrets.GH_PAT }}
 
       - name: Giant Files List
@@ -47,6 +155,7 @@ jobs:
   run-jupyter:
     name: test for jupyter
     needs: setup
+    if: needs.setup.outputs.test_type == 'full' || needs.setup.outputs.test_type == 'jupyter-only'
     strategy:
       matrix:
         envinfo:
@@ -78,8 +187,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          repository: ${{ needs.setup.outputs.target_repository }}
+          ref: ${{ needs.setup.outputs.target_ref }}
           token: ${{ secrets.GH_PAT }}
 
       - name: Set up Python
@@ -131,12 +240,13 @@ jobs:
     name: build web packages
     runs-on: ubuntu-22.04
     needs: setup
+    if: needs.setup.outputs.test_type == 'full' || needs.setup.outputs.test_type == 'build-only'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          repository: ${{ needs.setup.outputs.target_repository }}
+          ref: ${{ needs.setup.outputs.target_ref }}
           token: ${{ secrets.GH_PAT }}
           submodules: 'recursive'
 
@@ -161,8 +271,8 @@ jobs:
           path: tqsdk/web/*
 
   test-and-build:
-    needs: build-web
-    if: github.event.client_payload.tag_flag != 'true'
+    needs: [setup, build-web]
+    if: needs.setup.outputs.is_tag_release != 'true' && (needs.setup.outputs.test_type == 'full' || needs.setup.outputs.test_type == 'test-only')
     strategy:
       matrix:
         envinfo:
@@ -209,8 +319,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          repository: ${{ needs.setup.outputs.target_repository }}
+          ref: ${{ needs.setup.outputs.target_ref }}
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
@@ -265,7 +375,7 @@ jobs:
 
       - name: Run test case parallel
         id: test_case_parallel
-        if: github.event.client_payload.tag_flag != 'true'
+        if: needs.setup.outputs.is_tag_release != 'true'
         timeout-minutes: 90
         shell: bash
         env:
@@ -278,7 +388,7 @@ jobs:
 
       - name: Run test case
         id: test_case_nonparallel
-        if: github.event.client_payload.tag_flag != 'true'
+        if: needs.setup.outputs.is_tag_release != 'true'
         timeout-minutes: 90
         shell: bash
         run: |
@@ -294,8 +404,8 @@ jobs:
           path: ${{ env.TESTLOGPATH }}
 
   deploy-on-linux:
-    if: always()
-    needs: test-and-build
+    if: always() && needs.build-web.result != 'failure' && (needs.setup.outputs.test_type == 'full' || needs.setup.outputs.test_type == 'build-only')
+    needs: [setup, build-web, test-and-build]
     strategy:
       matrix:
         envinfo:
@@ -310,8 +420,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: shinnytech/tqsdk-python-private
-          ref: ${{ github.event.client_payload.ref }}
+          repository: ${{ needs.setup.outputs.target_repository }}
+          ref: ${{ needs.setup.outputs.target_ref }}
           token: ${{ secrets.GH_PAT }}
 
       - name: Download web-files
@@ -345,11 +455,11 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: edit setup.py to support shinny-pip
-        if: github.event.client_payload.pr_flag == 'true'
+        if: needs.setup.outputs.pr_flag == 'true'
         shell: bash
         env:
-          PAYLOAD_SHA: ${{ github.event.client_payload.sha }}
-          PAYLOAD_REF: ${{ github.event.client_payload.ref }}
+          PAYLOAD_SHA: ${{ needs.setup.outputs.sha }}
+          PAYLOAD_REF: ${{ needs.setup.outputs.target_ref }}
         run: |
           version_pattern="version\s*=\s*['\"].*['\"]"
           short_sha=${PAYLOAD_SHA:0:7}
@@ -396,14 +506,14 @@ jobs:
           path: doc/*
 
       - name: Publish to pypi
-        if: github.event.client_payload.tag_flag == 'true'
+        if: needs.setup.outputs.is_tag_release == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_PASSWORD }}
 
       - name: Setup ossutil
-        if: github.event.client_payload.tag_flag == 'true' || github.event.client_payload.ref == 'refs/heads/master' || github.event.client_payload.pr_flag == 'true'
+        if: needs.setup.outputs.is_tag_release == 'true' || needs.setup.outputs.target_ref == 'refs/heads/master' || needs.setup.outputs.pr_flag == 'true'
         uses: yizhoumo/setup-ossutil@v1
         with:
           endpoint: "oss-accelerate.aliyuncs.com"
@@ -411,20 +521,20 @@ jobs:
           access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
 
       - name: Upload to Oss - tag
-        if: github.event.client_payload.tag_flag == 'true'
+        if: needs.setup.outputs.is_tag_release == 'true'
         shell: bash
         run: |
-          ossutil cp -rf build/doc oss://shinnydoc/tqsdk/${{github.event.client_payload.tag_name}}/
+          ossutil cp -rf build/doc oss://shinnydoc/tqsdk/${{needs.setup.outputs.tag_name}}/
 
       - name: Upload to Oss - master
-        if: github.event.client_payload.ref == 'refs/heads/master'
+        if: needs.setup.outputs.target_ref == 'refs/heads/master'
         shell: bash
         run: |
           ossutil cp -rf build/doc oss://shinnydoc/tqsdk/master/
           ossutil cp -rf build/doc oss://shinnydoc/tqsdk/latest/
 
       - name: Upload to Oss - pr 
-        if: github.event.client_payload.pr_flag == 'true'
+        if: needs.setup.outputs.pr_flag == 'true'
         shell: bash
         run: |
           ossutil cp -f dist/*.whl oss://shinny-cd/tqsdk/"$DEST_DIR"dist/
@@ -432,8 +542,8 @@ jobs:
   tqsdk-python:
     name: tqsdk-python commit and pr
     runs-on: ubuntu-22.04
-    if: always() && github.event.client_payload.tag_flag == 'true'
-    needs: deploy-on-linux
+    if: always() && needs.setup.outputs.is_tag_release == 'true'
+    needs: [setup, deploy-on-linux]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -459,7 +569,7 @@ jobs:
         run: |
           cd ..
           tar -x -f *.tar.gz
-          cp -R tqsdk-${{github.event.client_payload.tag_name}}/* tqsdk-ci
+          cp -R tqsdk-${{needs.setup.outputs.tag_name}}/* tqsdk-ci
           cd tqsdk-ci
           git status
 
@@ -467,14 +577,15 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GH_PAT }}
-          commit-message: "Update Version ${{ github.event.client_payload.tag_name }}"
+          commit-message: "Update Version ${{ needs.setup.outputs.tag_name }}"
           branch-suffix: short-commit-hash
-          title: '[Tqsdk-Ci] Update Version ${{ github.event.client_payload.tag_name }}'
+          title: '[Tqsdk-Ci] Update Version ${{ needs.setup.outputs.tag_name }}'
 
   summary:
     name: summary CI result
-    needs: [ test-and-build, deploy-on-linux ]
+    needs: [ setup, run-jupyter, build-web, test-and-build, deploy-on-linux ]
     runs-on: ubuntu-22.04
+    if: always() && needs.setup.outputs.pr_number != ''
     steps:
       - name: Find Comment
         uses: peter-evans/find-comment@v1
@@ -482,7 +593,7 @@ jobs:
         with:
           repository: shinnytech/tqsdk-python-private
           token: ${{ secrets.GH_PAT }}
-          issue-number: ${{ github.event.client_payload.pr_number }}
+          issue-number: ${{ needs.setup.outputs.pr_number }}
           body-includes: https://github.com/shinnytech/tqsdk-ci/actions/runs/${{ github.run_id }}
 
       - name: Add comment show success
@@ -490,7 +601,7 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           repository: shinnytech/tqsdk-python-private
-          issue-number: ${{ github.event.client_payload.pr_number }}
+          issue-number: ${{ needs.setup.outputs.pr_number }}
           comment-id: ${{ steps.fc.outputs.comment-id }}
           body: |
             workflow ${{ github.run_id }} run success!
