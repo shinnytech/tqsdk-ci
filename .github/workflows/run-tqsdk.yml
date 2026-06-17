@@ -172,6 +172,7 @@ jobs:
       PYTHONUNBUFFERED: 1
       PYTHONIOENCODING: "utf-8"
       PYTHONHASHSEED: 32
+      AIOHTTP_NOSENDFILE: 1
       TZ: ${{ matrix.envinfo.TZ }}
       TESTLOGPATH: "./log_archive/"
       TESTLOGNAME: ${{ matrix.envinfo.name }}
