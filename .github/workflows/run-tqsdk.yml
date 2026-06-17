@@ -172,7 +172,6 @@ jobs:
       PYTHONUNBUFFERED: 1
       PYTHONIOENCODING: "utf-8"
       PYTHONHASHSEED: 32
-      AIOHTTP_NOSENDFILE: 1
       TZ: ${{ matrix.envinfo.TZ }}
       TESTLOGPATH: "./log_archive/"
       TESTLOGNAME: ${{ matrix.envinfo.name }}
@@ -245,6 +244,8 @@ jobs:
         if: github.event.client_payload.tag_flag != 'true'
         timeout-minutes: 90
         shell: bash
+        env:
+          AIOHTTP_NOSENDFILE: "1"
         run: |
           pytest tqsdk/test --cov=./tqsdk --cov-report xml:coverage2.xml -m nonparalleltest --disable-warnings\
             --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
