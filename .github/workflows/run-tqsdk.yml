@@ -152,6 +152,7 @@ jobs:
     needs: build-web
     if: github.event.client_payload.tag_flag != 'true'
     strategy:
+      fail-fast: false
       matrix:
         envinfo:
           - { name: 'linux-3.11-x64', os: ubuntu-22.04, python-version: 3.11.x, python-arch: x64, TZ: 'Asia/Shanghai', bdist-platform: 'manylinux1_x86_64' }
