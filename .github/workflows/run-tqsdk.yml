@@ -249,6 +249,13 @@ jobs:
             --log-level=ERROR --log-file-format="%(asctime)s - %(levelname)s - %(module)s:%(filename)s:%(lineno)d - %(message)s" --log-file-date-format="%Y-%m-%d %H:%M:%S" \
             --log-file=${{ env.TESTLOGPATH }}${{ env.TESTLOGNAME }}.log
 
+      - name: Setup tmate session for debug
+        if: ${{ failure() && steps.test_case_nonparallel.outcome == 'failure' && matrix.envinfo.name == 'windows-3.14-x64' && github.event.client_payload.debug_ssh == 'true' }}
+        timeout-minutes: 90
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - name: Upload log to artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
