@@ -387,6 +387,7 @@ jobs:
         run: |
           ossutil cp -rf build/doc oss://shinnydoc/tqsdk/master/
           ossutil cp -rf build/doc oss://shinnydoc/tqsdk/latest/
+          ossutil cp -f doc/5f948bf8f3e09d6df62f396ffe4c1510.txt oss://shinnydoc/5f948bf8f3e09d6df62f396ffe4c1510.txt
 
       - name: Upload to Oss - pr 
         if: github.event.client_payload.pr_flag == 'true'
